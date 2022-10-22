@@ -6,6 +6,7 @@ class apiAdmin extends api {
         global $admin;
         global $settings;
         global $patient;
+        global $invoice;
 
         // get all api url variables
         $urlData = explode("/", $request);
@@ -147,19 +148,47 @@ class apiAdmin extends api {
                         }
                     } else if (($mode == "patient") && ($action == "manage") && ($header['method'] == "DELETE")) {
                     } else if (($mode == "invoice") && ($action == "manage") && ($header['method'] == "POST")) {
+                        $invoice->admin_id = $this->admin_id;
+                        if ($this->findRight("mamange_accounts")) {
+                            if ($this->userData['rights']['write']) {
+                                $return = $invoice->create($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to write data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
                     } else if (($mode == "invoice") && ($action == "manage") && ($header['method'] == "PUT")) {
+                        $invoice->admin_id = $this->admin_id;
+                        if ($this->findRight("mamange_accounts")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $invoice->edit($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
                     } else if (($mode == "invoice") && ($action == "manage") && ($header['method'] == "GET")) {
-                        $patient->admin_id = $this->admin_id;
-                        if ($this->findRight("manage_patient")) {
+                        $invoice->admin_id = $this->admin_id;
+                        if ($this->findRight("mamange_accounts")) {
                             if ($this->userData['rights']['read']) {
                                 if (intval( $string  > 0)) {
-                                    $patient->id = $string;
-                                    $patient->filter = null;
+                                    $invoice->id = $string;
+                                    $invoice->filter = null;
                                 } else {
-                                    $patient->filter = $string;
-                                    $patient->search = (trim($extra) == "") ? null : $extra;
+                                    $invoice->filter = $string;
+                                    $invoice->search = (trim($extra) == "") ? null : $extra;
                                 }
-                                $return = $patient->get($this->page);
+                                $return = $invoice->get($this->page);
                             } else {
                                 $return['success'] = false;
                                 $return['error']['code'] = 10003;

@@ -1,6 +1,7 @@
 <?php
 class patient extends common {
     public $id;
+    public $minify = false;
     public $filter = null;
     public $search = null;
 
@@ -159,7 +160,10 @@ class patient extends common {
         if ($this->id > 0) {
             $data = $this->listOne($this->id);
             if ($data) {
-                return $this->successResponse['data'] = $this->formatResult( $data, true );
+                $this->successResponse['data'] = $this->formatResult( $data, true );
+                return $this->successResponse;
+            } else {
+                return $this->notFound;
             }
         } else {
             if ($this->filter != null ) {
@@ -216,15 +220,17 @@ class patient extends common {
         $return['sex'] = $data['sex'];
         $return['phoneNumber'] = $data['phone_number'];
         $return['email'] = $data['email'];
-        $return['address'] = $data['address'];
-        $return['kin']['name'] = $data['next_of_Kin'];
-        $return['kin']['contact'] = $data['next_of_contact'];
-        $return['kin']['address'] = $data['next_of_address'];
-        $return['allergies'] = $data['allergies'];
-        $return['type'] = $data['p_type'];
-        $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by']), true );
-        $return['date']['created'] = $data['create_time'];
-        $return['date']['modified'] = $data['modify_time'];
+        if ($this->minify === false) {
+            $return['address'] = $data['address'];
+            $return['kin']['name'] = $data['next_of_Kin'];
+            $return['kin']['contact'] = $data['next_of_contact'];
+            $return['kin']['address'] = $data['next_of_address'];
+            $return['allergies'] = $data['allergies'];
+            $return['type'] = $data['p_type'];
+            $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by']), true );
+            $return['date']['created'] = $data['create_time'];
+            $return['date']['modified'] = $data['modify_time'];
+        }
         return $return;
     }
 

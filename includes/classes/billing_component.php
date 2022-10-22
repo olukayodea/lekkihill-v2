@@ -44,8 +44,8 @@ class billing_component extends common {
         return $this->lists(table_name_prefix."billing_component", $start, $limit, $order, $dir, "`status` != 'DELETED'", $type);
     }
 
-    public function getSingle($name, $tag="title", $ref="ref") {
-        return $this->getOneField(table_name_prefix."billing_component", $name, $ref, $tag);
+    public function getSingle($val, $tag="title", $ref="ref") {
+        return $this->getOneField(table_name_prefix."billing_component", $val, $ref, $tag);
     }
 
     public function listOne($id) {
@@ -70,10 +70,30 @@ class billing_component extends common {
     private function clean($data) {
         global $admin;
 
-        $data['createdBy'] = $admin->formatResult( $admin->listOne( $data['created_by'] ), true);
-        $data['createdBy'] = $admin->formatResult( $admin->listOne( $data['last_modified_by'] ), true);
+        $data['ref'] = intval($data['ref']);
+
+        $cost['value'] = $data['cost'];
+        $cost['label'] = "&#8358;".number_format( $data['cost'] );
+        $data['cost'] = $cost;
+
+        if ($this->minify === false) {
+            $status['active'] = ("ACTIVE" == $data['status']) ? true : false;
+            $status['inActive'] = ("IN-ACTIVE" == $data['status']) ? true : false;
+            $data['status'] = $status;
+
+            $data['createdBy'] = $admin->formatResult( $admin->listOne( $data['created_by'] ), true);
+            $data['lastModifiedBy'] = $admin->formatResult( $admin->listOne( $data['last_modified_by'] ), true);
+
+            $data['date']['created'] = $data['create_time'];
+            $data['date']['modified'] = $data['modify_time'];
+        } else {
+            unset($data['ref']);
+            unset($data['status']);
+        }
         unset($data['created_by']);
         unset($data['last_modified_by']);
+        unset($data['create_time']);
+        unset($data['modify_time']);
         
         return $data;
     }

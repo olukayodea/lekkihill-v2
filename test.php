@@ -43,11 +43,11 @@ echo "<pre>";
 	// $url = $u."2.1/admin/logout";
 	// echo get($header, $url, $json_data);
 
-	//getdetails
-		$url = $u."v1/admin/profile";
-		echo get($header, $url);
+	// //getdetails
+	// 	$url = $u."v1/admin/profile";
+	// 	echo get($header, $url);
 
-    // // Patient
+    // // Invoice
     // // Add Patient
     //     $sex = array("Female", "Male");
 
@@ -87,9 +87,54 @@ echo "<pre>";
     //     $json_data = json_encode($array);
     //     echo put($header, $url, $json_data);
 
-	//getdetails
-		$url = $u."v1/patient/manage/search/ade";
-		echo get($header, $url);
+	// //getdetails
+	// 	$url = $u."v1/patient/manage/1";
+	// 	echo get($header, $url);
+
+	// //getdetails
+	// 	$url = $u."v1/patient/manage/list";
+	// 	echo get($header, $url);
+
+	// //getdetails
+	// 	$url = $u."v1/patient/manage/search/ade";
+	// 	echo get($header, $url);
+
+    // // invoice
+    // // Add invoice
+	// 	$array['patient_id'] = rand(1, 500);
+    //     for($i = 0; $i < rand(1, 20); $i++) {
+    //         $array['billing_component'][$i]['id'] = rand(1, 11);
+    //         $array['billing_component'][$i]['quantity'] = rand(1, 10);
+    //         $array['billing_component'][$i]['description'] = "random description ".rand();
+    //     }
+
+	// 	$url = $u."v1/invoice/manage";
+	// 	$json_data = json_encode($array);
+	// 	echo post($header, $url, $json_data);
+
+    // edit Patient
+		$array['ref'] = 22;
+        for($i = 0; $i < rand(1, 20); $i++) {
+            $array['billing_component'][$i]['id'] = rand(1, 11);
+            $array['billing_component'][$i]['quantity'] = rand(1, 10);
+            $array['billing_component'][$i]['description'] = "random description ".rand();
+        }
+
+        $url = $u."v1/invoice/manage";
+        $json_data = json_encode($array);
+        echo put($header, $url, $json_data);
+
+	// //getdetails
+	// 	$url = $u."v1/invoice/manage/4";
+	// 	echo get($header, $url);
+
+    // //getdetails
+    //     $url = $u."v1/invoice/manage/list";
+    //     echo get($header, $url);
+
+    // //getdetails
+    //     $url = $u."v1/invoice/manage/search/nat";
+    //     echo get($header, $url);
 
     // // Settings
     // // get settings

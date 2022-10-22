@@ -14,7 +14,6 @@ class billing extends common {
         "add" => array(
             "invoice_id",
             "billing_component_id",
-            "type",
             "quantity",
             "description",
             "patient_id",
@@ -25,7 +24,6 @@ class billing extends common {
             "ref",
             "invoice_id",
             "billing_component_id",
-            "type",
             "quantity",
             "description",
             "patient_id",
@@ -81,24 +79,34 @@ class billing extends common {
     }
 
     public function clean($data) {
-        global $admin;
-        global $patient;
         global $billing_component;
+        $billing_component->minify = true;
 
-        $data['createdBy'] = $admin->formatResult( $admin->listOne( $data['created_by'] ), true);
-        $data['patient'] = $patient->formatResult( $patient->listOne( $data['patient_id'] ), true);
+        $data['ref'] = intval($data['ref']);
+        $data['quantity'] = intval($data['quantity']);
 
-        $billing_component['id'] = $data['billing_component_id'];
-        $billing_component['name'] = $billing_component->getSingle( $data['billing_component_id'] );
-        $data['billing_component'] = $billing_component;
+
+        $status['unPaid'] = ("NEW" == $data['status']) ? true : false;
+        $status['partiallyPaid'] = ("PARTIALLY-PAID" == $data['status']) ? true : false;
+        $status['paid'] = ("PAID" == $data['status']) ? true : false;
+        $data['status'] = $status;
+
+        $billingComponent = $billing_component->formatResult($billing_component->listOne( $data['billing_component_id'] ), true);
+        $data['component'] = $billingComponent;
 
         $cost['value'] = $data['cost'];
         $cost['label'] = "&#8358; ".number_format( $data['cost'] );
         $data['cost'] = $cost;
+
+        $data['date']['created'] = $data['create_time'];
+        $data['date']['modified'] = $data['modify_time'];
         
         unset( $data['patient_id'] );
         unset( $data['added_by'] );
         unset( $data['billing_component_id'] );
+        unset($data['invoice_id']);
+        unset($data['create_time']);
+        unset($data['modify_time']);
         return $data;
     }
 
