@@ -7,6 +7,7 @@ class apiAdmin extends api {
         global $settings;
         global $patient;
         global $invoice;
+        global $billing_component;
 
         // get all api url variables
         $urlData = explode("/", $request);
@@ -201,6 +202,75 @@ class apiAdmin extends api {
                         }
                     } else if (($mode == "invoice") && ($action == "manage") && ($header['method'] == "DELETE")) {
 
+                    } else if (($mode == "billingcomponent") && ($action == "manage") && ($header['method'] == "POST")) {
+                        $billing_component->admin_id = $this->admin_id;
+                        if ($this->findRight("mamange_accounts")) {
+                            if ($this->userData['rights']['write']) {
+                                $return = $billing_component->create($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to write data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "billingcomponent") && ($action == "manage") && ($header['method'] == "PUT")) {
+                        $billing_component->admin_id = $this->admin_id;
+                        if ($this->findRight("mamange_accounts")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $billing_component->create($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "billingcomponent") && ($action == "status")) {
+                        $billing_component->admin_id = $this->admin_id;
+                        if ($this->findRight("mamange_accounts")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $billing_component->changeStatus($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "billingcomponent") && ($action == "manage") && ($header['method'] == "GET")) {
+                        $billing_component->admin_id = $this->admin_id;
+                        if ($this->findRight("mamange_accounts")) {
+                            if ($this->userData['rights']['read']) {
+                                if (intval( $string  > 0)) {
+                                    $billing_component->id = $string;
+                                    $billing_component->filter = null;
+                                } else {
+                                    $billing_component->filter = $string;
+                                    $billing_component->search = (trim($extra) == "") ? null : $extra;
+                                }
+                                $return = $billing_component->get($this->page);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "billingcomponent") && ($action == "manage") && ($header['method'] == "DELETE")) {
+
                     } else if (($mode == "settings") && ($header['method'] == "POST")) {
 
                         if ($this->findRight("manage_settings")) {
@@ -293,6 +363,7 @@ class apiAdmin extends api {
             $array[] = "admin:login";
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
+            $array[] = "billingcomponent:manage";
             $array[] = "settings:";
             if (array_search($type, $array) === false) {
                 return false;
@@ -312,6 +383,7 @@ class apiAdmin extends api {
             $array[] = "admin:getdata";
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
+            $array[] = "billingcomponent:manage";
             $array[] = "settings:";
             if (array_search($type, $array) === false) {
                 return false;
@@ -326,6 +398,8 @@ class apiAdmin extends api {
             $array[] = "admin:setpassword";
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
+            $array[] = "billingcomponent:manage";
+            $array[] = "billingcomponent:status";
             if (array_search($type, $array) === false) {
                 return false;
             } else {
@@ -336,6 +410,7 @@ class apiAdmin extends api {
             $array[] = "admin:remove";
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
+            $array[] = "billingcomponent:manage";
             if (array_search($type, $array) === false) {
                 return false;
             } else {

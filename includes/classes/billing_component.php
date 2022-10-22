@@ -1,6 +1,10 @@
 <?php
 class billing_component extends common {
+    public $id;
     public $minify = false;
+    public $filter = null;
+    public $search = null;
+
     protected $allowedFields = array(
         "add" => array(
             "title",
@@ -23,16 +27,74 @@ class billing_component extends common {
             return $this->BadReques;
         }
 
+        $array['created_by'] = $array['last_modified_by'] = $this->admin_id;
+
         $replace[] = "title";
         $replace[] = "description";
         $replace[] = "cost";
         $replace[] = "last_modified_by";
-        $replace[] = "status";
         
         if ($array['ref'] == 0) {
             unset($array['ref']);
         }
-        return $this->replace(table_name_prefix."billing_component", $array, $replace);
+        $id = $this->replace(table_name_prefix."billing_component", $array, $replace);
+
+        if ($id) {
+            $this->successResponse['data'] = $this->formatResult( $this->listOne( $id), true );
+            return $this->successResponse;
+        } else {
+            return $this->internalServerError;
+        }
+    }
+
+		
+    function modifyOne($tag, $value, $id) {
+        if ($this->updateOne(table_name_prefix."billing_component", $tag, $value, $id, "ref", "`modify_time` = ".time())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function changeStatus($array) {
+        $data = $this->listOne($array['ref']);
+        if ($data) {
+            if ($array['status'] == "activate") {
+                if ($data['status'] == "IN-ACTIVE") {
+                    $this->modifyOne("status", "ACTIVE", $array['ref']);
+                    $this->modifyOne("last_modified_by", $this->admin_id, $array['ref']);
+                    $this->return['success'] = true;
+                    $this->return['results'] = "OK";
+                    $this->return['data'] = $this->formatResult( $this->listOne($data['ref']), true);
+                } else {
+                    $this->return['success'] = false;
+                    $this->return['error']['code'] = 10063;
+                    $this->return['error']["message"] = "This component can not be activated";
+                }
+            } else if ($array['status'] == "deactivate") {
+                if ($data['status'] == "ACTIVE") {
+                    $this->modifyOne("status", "IN-ACTIVE", $array['ref']);
+                    $this->modifyOne("last_modified_by", $this->admin_id, $array['ref']);
+                    $this->return['success'] = true;
+                    $this->return['results'] = "OK";
+                    $this->return['data'] = $this->formatResult( $this->listOne($data['ref']), true);
+                } else {
+                    $this->return['success'] = false;
+                    $this->return['error']['code'] = 10064;
+                    $this->return['error']["message"] = "This component can not be deactivated";
+                }
+            } else {
+                $this->return['success'] = false;
+                $this->return['error']['code'] = 10017;
+                $this->return['error']["message"] = "Invalid status change action";
+            }
+        } else {
+            $this->return['success'] = false;
+            $this->return['error']['code'] = 10066;
+            $this->return['error']["message"] = "Can not retrieve category";
+        }
+
+        return $this->return;
     }
 
     public function getCount() {
@@ -56,6 +118,84 @@ class billing_component extends common {
         return $this->sortAll(table_name_prefix."billing_component", $id, $tag, $tag2, $id2, $tag3, $id3, $order, $dir, $logic, $start, $limit);
     }
 
+    private function listPages($start, $limit) {
+        $return['data'] = $this->lists(table_name_prefix."billing_component", $start, $limit, "title", "ASC");
+        $return['counts'] = $this->lists(table_name_prefix."billing_component",  false, false, "title", "ASC", false, "count");
+
+        return $return;
+    }
+
+    private function search($search, $start, $limit) {
+        $return['data'] = $this->runSearch($search, $start, $limit);
+        $return['counts'] = $this->runSearch($search,  false, false, "count");
+
+        return $return;
+    }
+
+    private function runSearch($search, $start, $limit, $type="list") {
+        if ($limit == true) {
+            $add = " LIMIT ".$start.", ".$limit;
+        } else {
+            $add = "";
+        }
+
+        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."billing_component` WHERE (`title` LIKE :search OR `cost` LIKE :search OR `description` LIKE :search OR `status` LIKE :search) ORDER BY `title` ASC".$add, array(':search' => "%".$search."%"), $type);
+
+    }
+
+    public function get($page=1)  {
+        global $settings;
+
+        if (intval($page) == 0) {
+            $page = 1;
+        }
+        $current = (intval($page) > 0) ? (intval($page)-1) : 0;
+        $limit = intval($settings->get("resultPerPage"));
+        $start = $current*$limit;
+
+        $this->successResponse;
+        if ($this->id > 0) {
+            $data = $this->listOne($this->id);
+            if ($data) {
+                $this->successResponse['data'] = $this->formatResult( $data, true );
+                return $this->successResponse;
+            } else {
+                return $this->notFound;
+            }
+        } else {
+            if ($this->filter != null ) {
+                if ($this->filter == "list" ) {
+                    $result = $this->listPages($start, $limit);
+                } else if ($this->filter == "search" ) {
+                    if ($this->search !== null) {
+                    $result = $this->search($this->search, $start, $limit);
+                    } else {
+                        $result['counts'] = 0;
+                    }
+                } else {
+                    return $this->NotAcceptable;
+                }
+
+                if ($result['counts'] > 0) {
+                    $this->successResponse['counts']['currentPage'] = intval($page);
+                    $this->successResponse['counts']['totalPage'] = ceil($result['counts']/$limit);
+                    $this->successResponse['counts']['rowOnCurrentPage'] = count($result['data']);
+                    $this->successResponse['counts']['maxRowPerPage'] = intval($limit);
+                    $this->successResponse['counts']['totalRows'] = $result['counts'];
+                    $this->successResponse['counts']['prevRow'] = (intval($page) * intval($limit)) - intval($limit);
+                    $this->successResponse['data'] = $this->formatResult( $result['data'] );
+                } else {
+                    $this->successResponse['data'] = [];
+                }
+
+                return $this->successResponse;
+            } else {
+                return $this->NotAcceptable;
+            }
+        }
+
+    }
+
     public function formatResult($data, $single=false) {
         if ($single == false) {
             for ($i = 0; $i < count($data); $i++) {
@@ -69,6 +209,7 @@ class billing_component extends common {
 
     private function clean($data) {
         global $admin;
+        $admin->minify = true;
 
         $data['ref'] = intval($data['ref']);
 

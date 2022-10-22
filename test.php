@@ -112,17 +112,17 @@ echo "<pre>";
 	// 	$json_data = json_encode($array);
 	// 	echo post($header, $url, $json_data);
 
-    // edit Patient
-		$array['ref'] = 22;
-        for($i = 0; $i < rand(1, 20); $i++) {
-            $array['billing_component'][$i]['id'] = rand(1, 11);
-            $array['billing_component'][$i]['quantity'] = rand(1, 10);
-            $array['billing_component'][$i]['description'] = "random description ".rand();
-        }
+    // // edit Patient
+	// 	$array['ref'] = 22;
+    //     for($i = 0; $i < rand(1, 20); $i++) {
+    //         $array['billing_component'][$i]['id'] = rand(1, 11);
+    //         $array['billing_component'][$i]['quantity'] = rand(1, 10);
+    //         $array['billing_component'][$i]['description'] = "random description ".rand();
+    //     }
 
-        $url = $u."v1/invoice/manage";
-        $json_data = json_encode($array);
-        echo put($header, $url, $json_data);
+    //     $url = $u."v1/invoice/manage";
+    //     $json_data = json_encode($array);
+    //     echo put($header, $url, $json_data);
 
 	// //getdetails
 	// 	$url = $u."v1/invoice/manage/4";
@@ -135,6 +135,48 @@ echo "<pre>";
     // //getdetails
     //     $url = $u."v1/invoice/manage/search/nat";
     //     echo get($header, $url);
+
+    // // Billing Component
+    // // Add Billing Component
+		
+    //     $array['title'] = "title".rand();
+    //     $array['cost'] = rand(1008, 9000000);
+    //     $array['description'] = "random description ".rand();
+
+	// 	$url = $u."v1/billingComponent/manage";
+	// 	$json_data = json_encode($array);
+	// 	echo post($header, $url, $json_data);
+
+    // // edit Billing Component
+	// 	$array['ref'] = 14;
+    //     $array['title'] = "title ".rand();
+    //     $array['cost'] = rand(1008, 9000000);
+    //     $array['description'] = "random description ".rand();
+
+    //     $url = $u."v1/billingComponent/manage";
+    //     $json_data = json_encode($array);
+    //     echo put($header, $url, $json_data);
+
+	// //get Billing Component
+	// 	$url = $u."v1/billingComponent/manage/4";
+	// 	echo get($header, $url);
+
+    // //get Billing Component
+    //     $url = $u."v1/billingComponent/manage/list";
+    //     echo get($header, $url);
+
+    // //get Billing Component
+    //     $url = $u."v1/billingComponent/manage/search/reast";
+    //     echo get($header, $url);
+
+
+	// change status
+		$array['ref'] = 14;
+		$array['status'] = "activate";
+		$url = $u."v1/billingComponent/status";
+		$json_data = json_encode($array);
+		echo put($header, $url, $json_data);
+
 
     // // Settings
     // // get settings
