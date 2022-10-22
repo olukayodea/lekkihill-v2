@@ -4,6 +4,8 @@ class apiAdmin extends api {
 
     public function prepare($header, $request, $data, $file=false) {
         global $admin;
+        global $settings;
+        global $patient;
 
         // get all api url variables
         $urlData = explode("/", $request);
@@ -34,7 +36,7 @@ class apiAdmin extends api {
                         if (($login['accountStatus']['newAccount']) || ($login['accountStatus']['passwordChange'])) {
                             $return['success'] = true;
                             $return['results'] = "OK";
-                            $this->user_id = $login['ref'];
+                            $this->admin_id = $login['ref'];
                             $return['token'] = $this->getToken();
                             $return['data']['accountStatus'] = $login['accountStatus'];
                         } else if ($login['accountStatus']['inactiveAccount']) {
@@ -44,7 +46,7 @@ class apiAdmin extends api {
                         } else {
                             $return['success'] = true;
                             $return['results'] = "OK";
-                            $this->user_id = $login['ref'];
+                            $this->admin_id = $login['ref'];
                             $return['data'] = $login;
                             $return['data']['token'] = $this->getToken();
                         }
@@ -64,57 +66,142 @@ class apiAdmin extends api {
                         $return['error']["message"] = "An error occured while performing this action, please try again";
                     }
                 } else if ($this->authenticate($header)) {
-                    $this->user_id = $this->userData['ref'];
-                    $this->countryList = $this->userData['rights']['countryList'];
-                    $this->selectedCountry = $this->userData['country']['iso'];
+                    $this->admin_id = $this->userData['ref'];
                     
                     if (($mode == "admin") && ($action == "logout")) {
-                        $admin->id = $this->user_id;
+                        $admin->id = $this->admin_id;
                         $admin->logout();
                         $return['success'] = true;
                         $return['results'] = "OK";
                     } else if (($mode == "admin") && ($action == "setpassword")) {
-                        $admin->selectedCountry = $this->userData['country']['iso'];
-                        $admin->id = $this->user_id;
+                        $admin->id = $this->admin_id;
                         $admin->isActivate = true;
 
                         $return = $admin->updatePassword($array_data);
 						$return['data']['token'] = $this->getToken();
                     } else if (($mode == "admin") && ($action == "profile") && ($header['method'] == "PUT")) {
-                        $admin->countryList = $this->userData['rights']['countryList'];
-                        $admin->selectedCountry = $this->userData['country']['iso'];
-                        $admin->admin_id = $this->user_id;
+                        $admin->admin_id = $this->admin_id;
 
                         $return = $admin->editProfile($array_data);
                     } else if (($mode == "admin") && ($action == "profile")) {
-                        $admin->countryList = $this->userData['rights']['countryList'];
-                        $admin->selectedCountry = $this->userData['country']['iso'];
-                        $admin->id = $this->user_id;
+                        $admin->id = $this->admin_id;
                         $return['success'] = true;
                         $return['results'] = "OK";
                         $return['data'] = $this->userData;
-                    } else if (($mode == "admin") && ($action == "dashboard")) {
-                        $admin->countryList = $this->userData['rights']['countryList'];
-                        $admin->selectedCountry = $this->userData['country']['iso'];
-                        if ($this->findRight("index")) {
-                            $return['success'] = true;
-                            $return['results'] = "OK";
-                            $return['data'] = $this->dashData();
+                    } else if (($mode == "admin") && ($action == "updatepassword")) {
+                        $admin->id = $this->admin_id;
+                        $return = $admin->updatePassword($array_data);
+                    } else if (($mode == "patient") && ($action == "manage") && ($header['method'] == "POST")) {
+                        $patient->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['write']) {
+                                $array_data['p_type'] = "regular";
+                                $return = $patient->create($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to write data";
+                            }
                         } else {
                             $return['success'] = false;
                             $return['error']['code'] = 10000;
                             $return['error']["message"] = "You do not have permission to view this page";
                         }
-                    } else if (($mode == "admin") && ($action == "updatepassword")) {
-                        $admin->countryList = $this->userData['rights']['countryList'];
-                        $admin->selectedCountry = $this->userData['country']['iso'];
-                        $admin->id = $this->user_id;
-                        $return = $admin->updatePassword($array_data);
-                    } else if (($mode == "patient") && ($action == "manage") && ($header['method'] == "POST")) {
                     } else if (($mode == "patient") && ($action == "manage") && ($header['method'] == "GET")) {
+                        $patient->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['read']) {
+                                if (intval( $string  > 0)) {
+                                    $patient->id = $string;
+                                    $patient->filter = null;
+                                } else {
+                                    $patient->filter = $string;
+                                    $patient->search = (trim($extra) == "") ? null : $extra;
+                                }
+                                $return = $patient->get($this->page);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
                     } else if (($mode == "patient") && ($action == "manage") && ($header['method'] == "PUT")) {
+                        $patient->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['modify']) {
+                                $array_data['p_type'] = "regular";
+                                $return = $patient->edit($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
                     } else if (($mode == "patient") && ($action == "manage") && ($header['method'] == "DELETE")) {
-                    }
+                    } else if (($mode == "invoice") && ($action == "manage") && ($header['method'] == "POST")) {
+                    } else if (($mode == "invoice") && ($action == "manage") && ($header['method'] == "PUT")) {
+                    } else if (($mode == "invoice") && ($action == "manage") && ($header['method'] == "GET")) {
+                        $patient->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['read']) {
+                                if (intval( $string  > 0)) {
+                                    $patient->id = $string;
+                                    $patient->filter = null;
+                                } else {
+                                    $patient->filter = $string;
+                                    $patient->search = (trim($extra) == "") ? null : $extra;
+                                }
+                                $return = $patient->get($this->page);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "invoice") && ($action == "manage") && ($header['method'] == "DELETE")) {
+
+                    } else if (($mode == "settings") && ($header['method'] == "POST")) {
+
+                        if ($this->findRight("manage_settings")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $settings->setSettings($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "settings") && ($header['method'] == "GET")) {
+                        if ($this->findRight("manage_settings")) {
+                            if ($this->userData['rights']['read']) {
+                                $return = $settings->getSettings();
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    }  
                     
                 } else {
                     $return['success'] = false;
@@ -155,7 +242,7 @@ class apiAdmin extends api {
                 
                 $this->userData = $admin->formatResult( $admin->listOne($token, "user_token"), true);
                 if (($this->userData['accountStatus']['activeAccount'] == true) || ($this->userData['accountStatus']['passwordChange'] == true) || ($this->userData['accountStatus']['newAccount'] == true)) {
-                    $this->user_id = $this->userData['ID'];
+                    $this->admin_id = $this->userData['ID'];
                     $this->userRoles = $this->userData['rights']['pages'];
                     return true;
                 } else {
@@ -176,6 +263,8 @@ class apiAdmin extends api {
             $array[] = "admin:right";
             $array[] = "admin:login";
             $array[] = "patient:manage";
+            $array[] = "invoice:manage";
+            $array[] = "settings:";
             if (array_search($type, $array) === false) {
                 return false;
             } else {
@@ -193,6 +282,8 @@ class apiAdmin extends api {
             $array[] = "admin:right";
             $array[] = "admin:getdata";
             $array[] = "patient:manage";
+            $array[] = "invoice:manage";
+            $array[] = "settings:";
             if (array_search($type, $array) === false) {
                 return false;
             } else {
@@ -205,6 +296,7 @@ class apiAdmin extends api {
             $array[] = "admin:updatepassword";
             $array[] = "admin:setpassword";
             $array[] = "patient:manage";
+            $array[] = "invoice:manage";
             if (array_search($type, $array) === false) {
                 return false;
             } else {
@@ -214,6 +306,7 @@ class apiAdmin extends api {
             $array[] = "main:";
             $array[] = "admin:remove";
             $array[] = "patient:manage";
+            $array[] = "invoice:manage";
             if (array_search($type, $array) === false) {
                 return false;
             } else {
@@ -226,14 +319,14 @@ class apiAdmin extends api {
 
     private function getToken () {
         global $admin;
-        $userData = $admin->listOne($this->user_id);
+        $userData = $admin->listOne($this->admin_id);
         if (($userData['user_token'] != "") && ($userData['auth_token_expire'] > time())) {
-            $admin->modifyOne("auth_token_expire", time()+(60*60*24*180), $this->user_id, "ID");
+            $admin->modifyOne("auth_token_expire", time()+(60*60*24*180), $this->admin_id, "ID");
             return $userData['user_token'];
         } else {
-            $token = substr( $this->user_id.rand().time().$this->createRandomPassword(15).rand(), 0, 32);
-            $admin->modifyOne("user_token", $token, $this->user_id, "ID");
-            $admin->modifyOne("auth_token_expire", time()+(60*60*24*180), $this->user_id, "ID");
+            $token = substr( $this->admin_id.rand().time().$this->createRandomPassword(15).rand(), 0, 32);
+            $admin->modifyOne("user_token", $token, $this->admin_id, "ID");
+            $admin->modifyOne("auth_token_expire", time()+(60*60*24*180), $this->admin_id, "ID");
             return $token;
         }
     }

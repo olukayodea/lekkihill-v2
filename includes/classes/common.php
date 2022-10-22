@@ -1,21 +1,23 @@
 <?php
 	class common extends database {
-		protected $return = [];
+		public $return = [];
 		public $countryList = [];
 		public $selectedCountry;
 		public $super = false;
 		public $clientId;
 		public $token_id;
+		public $admin_id;
 
-		public static $message;
-		public static $error_message;
-		public static $successResponse = array("status" => 200, "message" => "OK");
-		public static $notFound = array("status" => 404, "message" => "Not Found");
-		public static $NotModified = array("status" => 304, "message" => "Not Modified");
-		public static $Unauthorized = array("status" => 401, "message" => "Unauthorized");
-		public static $NotAcceptable = array("status" => 406, "message" => "Not Acceptable");
-		public static $BadReques = array("status" => 400, "message" => "Bad Reques");
-		public static $internalServerError = array("status" => 500, "message" => "Internal Server Error");
+		public $message;
+		public $error_message;
+		public $successResponse = array("success" => true, "results" => "OK");
+		public $notFound = array("success" => false, "error" => array(  "code" => 404, "message" => "Not Found"));
+		public $NotModified = array("success" => false, "error" => array(  "code" => 304, "message" => "Not Modified"));
+		public $Unauthorized = array("success" => false, "error" => array(  "code" => 401, "message" => "Unauthorized"));
+		public $NotAcceptable = array("success" => false, "error" => array(  "code" => 406, "message" => "Not Acceptable"));
+		public $RequiredSettingsNotFound = array("success" => false, "error" => array(  "code" => 404, "message" => "Required Settings not Configured"));
+		public $BadReques = array("success" => false, "error" => array(  "code" => 400, "message" => "Bad Reques"));
+		public $internalServerError = array("success" => false, "error" => array( "code" => 500, "message" => "Internal Server Error"));
 
 		function readFile($key) {
 			return $this->getOneField("accessTokens", $key, "tokenKey", "token");
@@ -320,55 +322,6 @@
 			return $result;
 		}
 		
-		private function dash() {
-			global $advert;
-			global $survey;
-			global $analytics_daily_active;
-			global $currency;
-			global $payouts;
-			global $settings;
-			global $users;
-			
-			$currency->selectedCountry = $this->selectedCountry;
-			$payouts->selectedCountry = $this->selectedCountry;
-			$result['users']['value'] = count($users->listAll());
-			$result['users']['label'] = $this->numberPrintFormat($result['users']['value']);			
-			$result['active']['value'] = intval($analytics_daily_active->currentlyActive());
-			$result['active']['label'] = $this->numberPrintFormat($result['active']['value']);	
-			$result['advert']['value'] = count($advert->listAll());
-			$result['advert']['label'] = $this->numberPrintFormat($result['advert']['value']);	
-			$result['survey']['value'] = count($survey->listAll());
-			$result['survey']['label'] = $this->numberPrintFormat($result['survey']['value']);
-			$result['running']['advert']['value'] = count($advert->sortAllCalls("approved", "payment_status", "status", "active"));
-			$result['running']['advert']['label'] = $this->numberPrintFormat($result['running']['advert']['value']);
-			$result['running']['survey']['value'] = count($survey->sortAllCalls("approved", "payment_status", "status", "active"));
-			$result['running']['survey']['label'] = $this->numberPrintFormat($result['running']['survey']['value']);
-			$result['payout']['amount'] = $payouts->totalAll();
-			$result['payout']['label'] = $this->numberPrintFormat($result['payout']['amount']);	
-			$result['payout']['currency'] = $currency->getCurrency();
-			$result['balance']['airTime']['amount'] = $settings->get("air_time_balance");
-			$result['balance']['airTime']['label'] = number_format($result['balance']['airTime']['amount'], 2);	
-			$result['balance']['airTime']['currency'] = $currency->getCurrency();
-			$result['balance']['cash']['amount'] = $settings->get("cash_balance");
-			$result['balance']['cash']['label'] = number_format($result['balance']['cash']['amount'], 2);	
-			$result['balance']['cash']['currency'] = $currency->getCurrency();
-			
-			return $result;
-		}
-
-		public function refreshBalance() {
-			global $reward;
-			global $flutter_wave;
-			global $settings;
-			$reward->selectedCountry = $this->selectedCountry;
-			$settings->selectedCountry = $this->selectedCountry;
-			
-			$reward->topupBalance();
-			$balance = $flutter_wave->getBalance();
-			$settings->modify("cash_balance", $balance);
-			return $this->dash();
-		}
-		
 		function http2https() {
 			//If the HTTPS is not found to be "on"
 			if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
@@ -379,170 +332,14 @@
 			}
 		}
 
-		function addLog($array) {
-			$array['country'] = strtoupper($this->selectedCountry);
-			$array['create_time'] = time();
-
-			return $this->insert("system_log", $array);
-		}
-		
-		function countAlLog() {
-			if (trim($this->selectedCountry) != "") {
-				$added = "`country` LIKE '%".$this->selectedCountry."%'";
-			} else {
-				$added = false;
-			}
-			return $this->lists("system_log", false, false, "ref", "DESC", $added, "count");
-		}
-		
-		function listAllLog($start=false, $limit=false, $type="list") {
-			if (trim($this->selectedCountry) != "") {
-				$added = "`country` LIKE '%".$this->selectedCountry."%' ";
-			} else {
-				$added = false;
-			}
-			return $this->lists("system_log", $start, $limit, "ref", "DESC", $added, $type);
-		}
-
-		private function systemLog($start, $limit) {
-			$return['data'] = $this->listAllLog($start, $limit);
-			$return['counts'] = $this->listAllLog(false, false, "count");
-
-			return $return;
-		}
-
-		public function systemLogApi($page) {
-			global $options;
-			if (intval($page) == 0) {
-				$page = 1;
-			}
-			$current = (intval($page) > 0) ? (intval($page)-1) : 0;
-			$limit = intval($options->get("resultPerPage"));
-			$start = $current*$limit;
-
-			$this->return['success'] = true;
-			$this->return['results'] = "OK";
-			$result = $this->systemLog($start, $limit);
-			if ($result['counts'] > 0) {
-				$this->return['counts']['currentPage'] = intval($page);
-				$this->return['counts']['totalPage'] = ceil($result['counts']/$limit);
-				$this->return['counts']['rowOnCurrentPage'] = count($result['data']);
-				$this->return['counts']['maxRowPerPage'] = intval($limit);
-				$this->return['counts']['totalRows'] = $result['counts'];
-				$this->return['data'] = $this->commonFormatResult( $result['data'] );
-			} else {
-				$this->return['data'] = [];
-			}
-
-			return $this->return;
-		}
-		
-		function sortAllCallsLog($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order='ref') {
-			if (trim($this->selectedCountry) != "") {
-				$added = " AND `country` LIKE '%".$this->selectedCountry."%'";
-			} else {
-				$added = false;
-			}
-
-			return $this->sortAll("system_log", $id, $tag, $tag2, $id2, $tag3, $id3, $order, "ASC", "AND", false, false, "list", $added);
-		}
-		
-		function listOneLog($id, $tag='ref') {
-			return $this->getOne("system_log", $id, $tag);
-		}
-		
-		function listOneFieldLog($id, $tag="ref", $ref="title") {
-			$data = $this->listOneLog($id, $tag);
-			return $data[$ref];
-		}
-
-		public function clientDashData() {
-			global $advert;
-			global $survey;
-			$this->return['dashData'] = $this->clientDash();
-			$this->return['advert'] = $advert->formatResult($advert->clientListAll($this->clientId, "active", 0, 10));
-			$this->return['survey'] = $survey->formatResult($survey->clientListAll($this->clientId, "active", 0, 10));
-
-			return $this->return;
-		}
-
-		public function dashData() {
-			global $advert;
-			global $survey;
-			global $transactions;
-			global $clients;
-			global $advert_chart;
-			global $analytics_daily;
-			global $analytics_daily_active;
-			// $this->return['dashData'] = $this->dash();
-			// $this->return['advert'] = $advert->formatResult($advert->sortAllCalls("approved", "payment_status", "status", "active"));
-			// $this->return['survey'] = $survey->formatResult($survey->sortAllCalls("approved", "payment_status", "status", "active"));
-			// $this->return['transaction'] = $transactions->formatResult($transactions->listAllHome());
-			// $this->return['clients'] = $clients->formatResult($clients->listAll());
-			// $this->return['age'] = $advert_chart->homeAge();
-			// $this->return['sex'] = $advert_chart->homeSex();
-			// $this->return['category'] = $advert_chart->homeCat( $this->return['dashData']['users']['value'] );
-			// $this->return['sexAge'] = $advert_chart->homeSexAge();
-			// $this->return['userChart'] = $analytics_daily->homeCat();
-			// $this->return['activeUserChat'] = $analytics_daily_active->homeCat();
-
-			return $this->return;
-		}
-
-		private function commonFormatResult($data, $single=false) {
-			if ($data) {
-				if ($single === false) {
-					for ($i = 0; $i < count($data); $i++) {
-						$data[$i] = $this->clean($data[$i]);
-					}
-				} else {
-					$data = $this->clean($data);
+		public function CheckValidate($input, $check) {
+			foreach ($check as $row) {
+				if (!array_key_exists($row, $input)) {
+					return false;
+					break;
 				}
-			} else {
-				return [];
 			}
-			return $data;
-		}
-	
-		private function clean($data) {
-			$data['ref'] = intval($data['ref']);
-			$data['object_id'] = intval($data['object_id']);
-			$data['owner_id'] = intval($data['owner_id']);
-			return $data;
-		}
-
-		public function generateAccessoken( $data ) {
-			global $users;
-			$token = $users->listOneField( $this->token_id, "ref", "auth_token");
-
-			$product_key = rand();
-
-			$tokenIndex = rand(2,3);
-
-			$result[] = $product_key;
-			$result[] = $tokenIndex;
-			if ($tokenIndex == 2) {
-				$result[] = $token;
-				$result[] = substr( $this->token_id.rand().time().$this->createRandomPassword(15).rand(), 0, 32);
-			} else {
-				$result[] = substr( $this->token_id.rand().time().$this->createRandomPassword(15).rand(), 0, 32);
-				$result[] = $token;
-			}
-			$result[] = time();
-			$result[] = $data;
-
-			return base64_encode( serialize($result ));
-		}
-
-		public function readToken( $data ) {
-			global $users;
-			$result = unserialize( base64_decode( $data ) );
-
-            if ($users->checkExixst("users", "auth_token", $result[ $result[1]]) == 1) {
-                return $result[5];
-            } else {
-                return false;
-            }
+			return true;
 		}
 	}
 ?>

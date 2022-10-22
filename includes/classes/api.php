@@ -1,6 +1,5 @@
 <?php
   class api extends common {
-    public $user_id;
     public $fcm_token;
     public $merch_id;
     public $loc_id;

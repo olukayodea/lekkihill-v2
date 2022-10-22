@@ -43,17 +43,74 @@ echo "<pre>";
 	// $url = $u."2.1/admin/logout";
 	// echo get($header, $url, $json_data);
 
-	// //getdetails
-	// 	$url = $u."v1/admin/profile";
+	//getdetails
+		$url = $u."v1/admin/profile";
+		echo get($header, $url);
+
+    // // Patient
+    // // Add Patient
+    //     $sex = array("Female", "Male");
+
+
+	// 	$array['last_name'] = "last_name_".rand();
+	// 	$array['first_name'] = "first_name_".rand();
+	// 	$array['age'] = rand(18, 100);
+	// 	$array['phone_number'] = "080".rand(20000000, 99999999);
+	// 	$array['sex'] = $sex[rand(0, 1)];
+	// 	$array['email'] = "test_api_".rand()."@gmail.com";
+	// 	$array['address'] = rand(100, 999)." test Address, API Street, Computer State";
+	// 	$array['next_of_Kin'] = "next_of_Kin_".rand();
+	// 	$array['next_of_contact'] = "next_of_contact_".rand();
+	// 	$array['next_of_address'] = "next_of_address_".rand();
+	// 	$array['allergies'] = "allergies ".rand();
+	// 	$url = $u."v1/patient/manage";
+	// 	$json_data = json_encode($array);
+	// 	echo post($header, $url, $json_data);
+
+    // // edit Patient
+    //     $sex = array("Female", "Male");
+
+
+    //     $array['ref'] = 644;
+    //     $array['last_name'] = "last_name_".rand();
+    //     $array['first_name'] = "first_name_".rand();
+    //     $array['age'] = rand(18, 100);
+    //     $array['phone_number'] = "080".rand(20000000, 99999999);
+    //     $array['sex'] = $sex[rand(0, 1)];
+    //     $array['email'] = "test_api_".rand()."@gmail.com";
+    //     $array['address'] = rand(100, 999)." test Address, API Street, Computer State";
+    //     $array['next_of_Kin'] = "next_of_Kin_".rand();
+    //     $array['next_of_contact'] = "next_of_contact_".rand();
+    //     $array['next_of_address'] = "next_of_address_".rand();
+    //     $array['allergies'] = "allergies ".rand();
+    //     $url = $u."v1/patient/manage";
+    //     $json_data = json_encode($array);
+    //     echo put($header, $url, $json_data);
+
+	//getdetails
+		$url = $u."v1/patient/manage/search/ade";
+		echo get($header, $url);
+
+    // // Settings
+    // // get settings
+	// 	$url = $u."v1/settings";
+	// 	$json_data = json_encode($array);
 	// 	echo get($header, $url);
 
-    // Patient
-    // Add Patient
-		$array['username'] = "test";
-		$array['password'] = "lolade";
-		$url = $u."v1/patient/manage";
-		$json_data = json_encode($array);
-		echo post($header, $url, $json_data);
+    // // Add settings
+    //     $array = [
+    //         "consultationFee-cost" => 20000,
+    //         "consultationFee-component-id" => 1,
+    //         "lateFee" => 5000,
+    //         "registrationFee-cost" => 5000,
+    //         "registrationFee-component-id" => 6,
+    //         "medicationCategory" => 1,
+    //         "lowInventoryCount" => 0,
+    //         "alertGroup" => 'lekki_hill_admin'
+    //     ];
+    // 	$url = $u."v1/settings";
+    // 	$json_data = json_encode($array);
+    // 	echo post($header, $url, $json_data);
 
 
 	print_r($header);

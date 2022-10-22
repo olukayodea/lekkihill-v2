@@ -1,5 +1,6 @@
 <?php
 	class admin extends common {
+        public $minify = false;
 
         function wp_hash_password( $password ) {
             global $wp_hasher;
@@ -65,15 +66,6 @@
 					
 					$alerts = new alerts;
 					$alerts->sendEmail($mail);
-					//add to log
-					$logArray['object'] = get_class($this);
-					$logArray['object_id'] = $data['id'];
-					$logArray['owner'] = "admin";
-					$logArray['owner_id'] = $data['id'];
-					$logArray['desc'] = "updated password";
-					$logArray['create_time'] = time();
-					
-					$this->addLog($logArray);
 				} else {
 					return false;
 				}
@@ -177,24 +169,30 @@
 			return $this->sortAll("users", $id, $tag, $tag2, $id2, $tag3, $id3, $order, "DESC", "AND", $start, $limit, $type, $added);
 		}
 
-		function countAl() {
+
+        public function getSingle($name, $tag="user_login", $ref="ID") {
+            global $wpdb;
+            return $this->getOneField($wpdb->prefix."users", $name, $ref, $tag);
+        }
+
+		public function countAl() {
 			return $this->query("SELECT COUNT(*) FROM `".table_prefix."users` WHERE `status` != 'DELETED'", false, "getCol");
 		}
 		
-		function sortList($tag, $id) {
+		public function sortList($tag, $id) {
 			return $this->query("SELECT * FROM `".table_prefix."users` WHERE `".$tag."` = :id AND `status` != 'DELETED'", array(':id' => $id), "list");
 		}
 		
-		function listOne($id, $tag='id') {
+		public function listOne($id, $tag='id') {
 			return $this->getOne(""."users", $id, $tag);
 		}
 		
-		function listOneField($id, $tag='id', $ref='name') {
+		public function listOneField($id, $tag='id', $ref='name') {
 			$data = $this->listOne($id, $tag);
 			return $data[$ref];
 		}
         
-		function listOneType($id, $tag='slug') {				
+		public function listOneType($id, $tag='slug') {				
 			return $this->getOne("lekkihill_roles", $id, $tag);
 		}
 
@@ -221,15 +219,18 @@
 			$return['username'] = $row['user_login'];
 			$return['name'] = $row['display_name'];
 			$return['email'] = $row['user_email'];
-			$adminType = $this->listOneType($row['user_role']);
-            
-			$return['rights'] = $this->formatRightResult( $adminType, true);
-			$account['activeAccount'] = (1 == $row['app_status']) ? true : false;
-			$account['newAccount'] = (0 == $row['app_status']) ? true : false;
-			$account['inactiveAccount'] = (3 == $row['app_status']) ? true : false;
-			$account['passwordChange'] = (2 == $row['app_status']) ? true : false;
-			$return['accountStatus'] = $account;
-			$return['created'] = $row['user_registered'];
+
+            if ($this->minify === false) {
+                $adminType = $this->listOneType($row['user_role']);
+                
+                $return['rights'] = $this->formatRightResult( $adminType, true);
+                $account['activeAccount'] = (1 == $row['app_status']) ? true : false;
+                $account['newAccount'] = (0 == $row['app_status']) ? true : false;
+                $account['inactiveAccount'] = (3 == $row['app_status']) ? true : false;
+                $account['passwordChange'] = (2 == $row['app_status']) ? true : false;
+                $return['accountStatus'] = $account;
+                $return['created'] = $row['user_registered'];
+            }
 
 			return $return;
 		}

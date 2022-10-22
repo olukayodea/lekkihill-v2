@@ -26,6 +26,7 @@
 	define("dbpassword",  $dbpassword);
 	define("dbname",  $dbname);
 	define("table_prefix", $table_prefix );
+	define("table_name_prefix", "lekkihill_");
 
 	define("URLAdmin", $admin);
 	
@@ -53,8 +54,15 @@
 
 	include_once("classes/admin.php");
 	include_once("classes/patient.php");
+	include_once("classes/billing.php");
+	include_once("classes/billing_component.php");
+	include_once("classes/invoice.php");
+	include_once("classes/settings.php");
 	$admin = new admin;
 	$patient = new patient;
-
+	$billing = new billing;
+	$billing_component = new billing_component;
+	$invoice = new invoice;
+	$settings = new settings;
 	
 ?>
