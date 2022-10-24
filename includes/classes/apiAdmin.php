@@ -8,6 +8,7 @@ class apiAdmin extends api {
         global $patient;
         global $invoice;
         global $billing_component;
+        global $visitors;
 
         // get all api url variables
         $urlData = explode("/", $request);
@@ -93,6 +94,60 @@ class apiAdmin extends api {
                     } else if (($mode == "admin") && ($action == "updatepassword")) {
                         $admin->id = $this->admin_id;
                         $return = $admin->updatePassword($array_data);
+                    } else if (($mode == "visitors") && ($action == "manage") && ($header['method'] == "POST")) {
+                        $visitors->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_visitors")) {
+                            if ($this->userData['rights']['write']) {
+                                $return = $visitors->create($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to write data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "visitors") && ($action == "manage") && ($header['method'] == "GET")) {
+                        $visitors->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_visitors")) {
+                            if ($this->userData['rights']['read']) {
+                                if (intval( $string  > 0)) {
+                                    $visitors->id = $string;
+                                    $visitors->filter = null;
+                                } else {
+                                    $visitors->filter = $string;
+                                    $visitors->search = (trim($extra) == "") ? null : $extra;
+                                }
+                                $return = $visitors->get($this->page);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "visitors") && ($action == "manage") && ($header['method'] == "DELETE")) {
+                        $visitors->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_visitors")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $visitors->remove($string);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+
+                        
                     } else if (($mode == "patient") && ($action == "manage") && ($header['method'] == "POST")) {
                         $patient->admin_id = $this->admin_id;
                         if ($this->findRight("manage_patient")) {
@@ -201,7 +256,6 @@ class apiAdmin extends api {
                             $return['error']["message"] = "You do not have permission to view this page";
                         }
                     } else if (($mode == "invoice") && ($action == "manage") && ($header['method'] == "DELETE")) {
-
                     } else if (($mode == "billingcomponent") && ($action == "manage") && ($header['method'] == "POST")) {
                         $billing_component->admin_id = $this->admin_id;
                         if ($this->findRight("mamange_accounts")) {
@@ -364,6 +418,8 @@ class apiAdmin extends api {
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
             $array[] = "billingcomponent:manage";
+            $array[] = "visitors:manage";
+            $array[] = "appointment:manage";
             $array[] = "settings:";
             if (array_search($type, $array) === false) {
                 return false;
@@ -383,6 +439,8 @@ class apiAdmin extends api {
             $array[] = "admin:getdata";
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
+            $array[] = "visitors:manage";
+            $array[] = "appointment:manage";
             $array[] = "billingcomponent:manage";
             $array[] = "settings:";
             if (array_search($type, $array) === false) {
@@ -398,6 +456,7 @@ class apiAdmin extends api {
             $array[] = "admin:setpassword";
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
+            $array[] = "appointment:manage";
             $array[] = "billingcomponent:manage";
             $array[] = "billingcomponent:status";
             if (array_search($type, $array) === false) {
@@ -410,6 +469,8 @@ class apiAdmin extends api {
             $array[] = "admin:remove";
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
+            $array[] = "visitors:manage";
+            $array[] = "appointment:manage";
             $array[] = "billingcomponent:manage";
             if (array_search($type, $array) === false) {
                 return false;

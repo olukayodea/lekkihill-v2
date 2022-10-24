@@ -139,8 +139,23 @@ class invoice extends common {
     }
 
     private function listPages($start, $limit) {
-        $return['data'] = $this->lists(table_name_prefix."invoice", $start, $limit, "last_name", "ASC");
-        $return['counts'] = $this->lists(table_name_prefix."invoice",  false, false, "last_name", "ASC", false, "count");
+
+        if ($this->search !== null) {
+            if (strtolower($this->search) == "paid") {
+                $where = "`status` = 'PAID'";
+            } else if (strtolower($this->search) == "partiallypaid") {
+                $where = "`status` = 'PARTIALLY-PAID'";
+            } else if (strtolower($this->search) == "unpaid") {
+                $where = "`status` = 'UN-PAID'";
+            } else {
+                $where = false;
+            }
+            
+        } else {
+            $where = false;
+        }
+        $return['data'] = $this->lists(table_name_prefix."invoice", $start, $limit, "ref", "ASC", $where);
+        $return['counts'] = $this->lists(table_name_prefix."invoice",  false, false, "ref", "ASC", $where, "count");
 
         return $return;
     }
@@ -159,7 +174,7 @@ class invoice extends common {
             $add = "";
         }
 
-        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."invoice` WHERE (`amount` LIKE :search OR `due` LIKE :search OR `due_date` LIKE :search OR `status` LIKE :search OR `patient_id` IN (SELECT `ref` FROM `".table_prefix.table_name_prefix."patient` WHERE (`last_name` LIKE :search OR `first_name` LIKE :search OR `sex` LIKE :search OR `phone_number` LIKE :search OR `email` LIKE :search))) ORDER BY `due_date` ASC".$add, array(':search' => "%".$search."%"), $type);
+        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."invoice` WHERE (`ref` LIKE :search OR `amount` LIKE :search OR `due` LIKE :search OR `due_date` LIKE :search OR `status` LIKE :search OR `patient_id` IN (SELECT `ref` FROM `".table_prefix.table_name_prefix."patient` WHERE (`last_name` LIKE :search OR `first_name` LIKE :search OR `sex` LIKE :search OR `phone_number` LIKE :search OR `email` LIKE :search))) ORDER BY `due_date` ASC".$add, array(':search' => "%".$search."%"), $type);
     }
 
     public function get($page=1)  {
@@ -187,7 +202,7 @@ class invoice extends common {
                     $result = $this->listPages($start, $limit);
                 } else if ($this->filter == "search" ) {
                     if ($this->search !== null) {
-                    $result = $this->search($this->search, $start, $limit);
+                        $result = $this->search($this->search, $start, $limit);
                     } else {
                         $result['counts'] = 0;
                     }
@@ -226,6 +241,10 @@ class invoice extends common {
         return $data;
     }
 
+    private function invoiceNumber($id) {
+        return "INV".(10000+$id);
+    }
+
     private function clean($data) {
         global $patient;
         global $admin;
@@ -234,6 +253,7 @@ class invoice extends common {
         $patient->minify = true;
         
         $data['ref'] = intval($data['ref']);
+        $data['invoiceNumber'] = $this->invoiceNumber($data['ref']);
         $data['patient'] = $patient->formatResult( $patient->listOne( $data['patient_id'] ), true);
         
         $amount['value'] = $data['amount'];

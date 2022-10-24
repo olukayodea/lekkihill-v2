@@ -4,7 +4,7 @@ echo "<pre>";
 	$product_key = '32333518';
 	
 	$u = "http://127.0.0.1/lekkihill-v2/";
-    $token = "2763879251216663141164UDX98NSAQH";
+    $token = "283640767761666455991RFXDEBFMFHV";
 	// $u = "https://api.dev.skrinad.me/";
     // $token = "12990305521622781738U332BS9TLBUJ";
 
@@ -47,7 +47,36 @@ echo "<pre>";
 	// 	$url = $u."v1/admin/profile";
 	// 	echo get($header, $url);
 
-    // // Invoice
+    // // visitors
+    // // Add visitors
+	// 	$array['last_name'] = "last_name_".rand();
+	// 	$array['first_name'] = "first_name_".rand();
+	// 	$array['phone_number'] = "080".rand(20000000, 99999999);
+	// 	$array['email'] = "test_api_".rand()."@gmail.com";
+	// 	$array['address'] = rand(100, 999)." test Address, API Street, Computer State";
+	// 	$array['whom_to_see'] = "whom_to_see".rand();
+	// 	$array['resason'] = "resason ".rand();
+	// 	$url = $u."v1/visitors/manage";
+	// 	$json_data = json_encode($array);
+	// 	echo post($header, $url, $json_data);
+
+	// //getdetails
+	// 	$url = $u."v1/visitors/manage/1";
+	// 	echo get($header, $url);
+
+	// //getdetails
+	// 	$url = $u."v1/visitors/manage/list";
+	// 	echo get($header, $url);
+
+	// //getdetails
+	// 	$url = $u."v1/visitors/manage/search/last";
+	// 	echo get($header, $url);
+
+	// //remove
+	// 	$url = $u."v1/visitors/manage/6";
+	// 	echo delete($header, $url);
+
+    // // Patient
     // // Add Patient
     //     $sex = array("Female", "Male");
 
@@ -88,11 +117,11 @@ echo "<pre>";
     //     echo put($header, $url, $json_data);
 
 	// //getdetails
-	// 	$url = $u."v1/patient/manage/1";
+	// 	$url = $u."v1/patient/manage/";
 	// 	echo get($header, $url);
 
 	// //getdetails
-	// 	$url = $u."v1/patient/manage/list";
+	// 	$url = $u."v1/patient/manage/list?page=33";
 	// 	echo get($header, $url);
 
 	// //getdetails
@@ -132,6 +161,10 @@ echo "<pre>";
     //     $url = $u."v1/invoice/manage/list";
     //     echo get($header, $url);
 
+    //getdetails
+        $url = $u."v1/invoice/manage/list/unpaid";
+        echo get($header, $url);
+
     // //getdetails
     //     $url = $u."v1/invoice/manage/search/nat";
     //     echo get($header, $url);
@@ -169,14 +202,12 @@ echo "<pre>";
     //     $url = $u."v1/billingComponent/manage/search/reast";
     //     echo get($header, $url);
 
-
-	// change status
-		$array['ref'] = 14;
-		$array['status'] = "activate";
-		$url = $u."v1/billingComponent/status";
-		$json_data = json_encode($array);
-		echo put($header, $url, $json_data);
-
+	// // change status
+	// 	$array['ref'] = 14;
+	// 	$array['status'] = "activate";
+	// 	$url = $u."v1/billingComponent/status";
+	// 	$json_data = json_encode($array);
+	// 	echo put($header, $url, $json_data);
 
     // // Settings
     // // get settings
