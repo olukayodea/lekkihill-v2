@@ -113,9 +113,53 @@ class invoice extends common {
         }
     }
 
+    public function payInvoice($data) {
+        global $billing;
+        global $invoiceLog;
+        if ($this->query("UPDATE ".table_prefix.table_name_prefix."invoice SET `due` = (`due`-".$data['amount'].") WHERE `ref` = ".$data['ref'])) {
+            $this->modifyOne("status", "PARTIALLY-PAID", $data['ref']);
+            $billing->modifyOne("status", "PARTIALLY-PAID", $data['ref'], "invoice_id");
+
+            $getOne = self::listOne($data['ref']);
+
+            if ($getOne['due'] <= 0) {
+                $this->modifyOne("status", "PAID", $data['ref']);
+                $billing->modifyOne("status", "PAID", $data['ref'], "invoice_id");
+            }
+
+            $array['create_by'] = $this->admin_id;
+            $array['invoice_id'] = $data['ref'];
+            $array['amount'] = $data['amount'];
+            $invoiceLog->create( $array );
+
+            //send reciept
+
+            $this->successResponse['data'] = $this->formatResult( $this->listOne( $data['ref']), true );
+            return $this->successResponse;
+        } else {
+            return $this->internalServerError;
+        }
+    }
+
+    public function remove($id) {
+        $data = $this->listOne($id);
+
+        if ($data['status'] == "UN-PAID") {
+            if ($this->delete(table_name_prefix."invoice", $id)) {
+                return $this->successResponse;
+            } else {
+                return $this->internalServerError;
+            }
+        } else {
+            $this->NotAcceptable['error']['message'] .= ". Invoice " . $this->invoiceNumber( $data['ref'] ) . " can not be deleted, You can only delete an Unpaid Invoice.";
+
+            return $this->NotAcceptable;
+        }
+    }
+
 
     public function getPending() {
-        return $this->query("SELECT * FROM ".table_name_prefix."invoice WHERE `status` != 'PAID'", false, "list");
+        return $this->query("SELECT * FROM ".table_prefix.table_name_prefix."invoice WHERE `status` != 'PAID'", false, "list");
     }
 
     public function modifyOne($tag, $value, $id, $ref="ref") {
@@ -154,8 +198,8 @@ class invoice extends common {
         } else {
             $where = false;
         }
-        $return['data'] = $this->lists(table_name_prefix."invoice", $start, $limit, "ref", "ASC", $where);
-        $return['counts'] = $this->lists(table_name_prefix."invoice",  false, false, "ref", "ASC", $where, "count");
+        $return['data'] = $this->lists(table_name_prefix."invoice", $start, $limit, "ref", "DESC", $where);
+        $return['counts'] = $this->lists(table_name_prefix."invoice",  false, false, "ref", "DESC", $where, "count");
 
         return $return;
     }
@@ -174,7 +218,19 @@ class invoice extends common {
             $add = "";
         }
 
-        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."invoice` WHERE (`ref` LIKE :search OR `amount` LIKE :search OR `due` LIKE :search OR `due_date` LIKE :search OR `status` LIKE :search OR `patient_id` IN (SELECT `ref` FROM `".table_prefix.table_name_prefix."patient` WHERE (`last_name` LIKE :search OR `first_name` LIKE :search OR `sex` LIKE :search OR `phone_number` LIKE :search OR `email` LIKE :search))) ORDER BY `due_date` ASC".$add, array(':search' => "%".$search."%"), $type);
+        if (strpos(strtolower($search), "inv") !== false) {
+            return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."invoice` WHERE `ref` = :search  ORDER BY `due_date`, `ref` DESC".$add, array(':search' => $this->idFromInvoiceNumber($search)), $type);
+        }
+
+        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."invoice` WHERE (`ref` LIKE :search OR `amount` LIKE :search OR `due` LIKE :search OR `due_date` LIKE :search OR `status` LIKE :search OR `patient_id` IN (SELECT `ref` FROM `".table_prefix.table_name_prefix."patient` WHERE (`last_name` LIKE :search OR `first_name` LIKE :search OR `sex` LIKE :search OR `phone_number` LIKE :search OR `email` LIKE :search))) ORDER BY `due_date`, `ref` DESC".$add, array(':search' => "%".$search."%"), $type);
+    }
+
+    public function getComponent() {
+        global $billing_component;
+        $data = $billing_component->getAactive();
+
+        $this->successResponse['data'] = $billing_component->formatResult( $data );
+        return $this->successResponse;
     }
 
     public function get($page=1)  {
@@ -230,6 +286,16 @@ class invoice extends common {
 
     }
 
+    private function invoiceNumber($id) {
+        return "INV".(10000+$id);
+    }
+
+    private function idFromInvoiceNumber( $invoiceNumber) {
+        $data = explode("inv", strtolower($invoiceNumber));
+
+        return $data[1] - 10000;
+    }
+
     public function formatResult($data, $single=false) {
         if ($single == false) {
             for ($i = 0; $i < count($data); $i++) {
@@ -240,15 +306,13 @@ class invoice extends common {
         }
         return $data;
     }
-
-    private function invoiceNumber($id) {
-        return "INV".(10000+$id);
-    }
-
+ 
     private function clean($data) {
         global $patient;
         global $admin;
         global $billing;
+        global $invoiceLog; 
+
         $admin->minify = true;
         $patient->minify = true;
         
@@ -264,6 +328,7 @@ class invoice extends common {
         $due['label'] = "&#8358;".number_format( $data['due'] );
         $data['due'] = $due;
 
+        $data['payments'] = $invoiceLog->formatResult( $invoiceLog->getList($data['ref']) );
 
         $status['unPaid'] = ("UN-PAID" == $data['status']) ? true : false;
         $status['partiallyPaid'] = ("PARTIALLY-PAID" == $data['status']) ? true : false;

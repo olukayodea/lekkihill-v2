@@ -55,7 +55,7 @@ class billing extends common {
         return $this->insert(table_name_prefix."billing", $array);
     }
 
-    public function modifyOneBill($tag, $value, $id, $ref="ref") {
+    public function modifyOne($tag, $value, $id, $ref="ref") {
         return $this->updateOne(table_name_prefix."billing", $tag, $value, $id, $ref);
     }
 
@@ -94,9 +94,13 @@ class billing extends common {
         $billingComponent = $billing_component->formatResult($billing_component->listOne( $data['billing_component_id'] ), true);
         $data['component'] = $billingComponent;
 
-        $cost['value'] = $data['cost'];
+        $cost['value'] = floatval($data['cost']);
         $cost['label'] = "&#8358; ".number_format( $data['cost'] );
         $data['cost'] = $cost;
+
+        $subTotal['value'] = intval($data['quantity']) * floatval($cost['value']);
+        $subTotal['label'] = "&#8358; ".number_format( intval($data['quantity']) * floatval($cost['value']) );
+        $data['subTotal'] = $subTotal;
 
         $data['date']['created'] = $data['create_time'];
         $data['date']['modified'] = $data['modify_time'];

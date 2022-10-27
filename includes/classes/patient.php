@@ -100,6 +100,17 @@ class patient extends common {
             return $this->NotModified;
         }
     }
+    
+
+    private static function patienrNumber($id) {
+        return "LH".(100000+$id);
+    }
+
+    private function idFromPatientNumber( $invoiceNumber) {
+        $data = explode("lh", strtolower($invoiceNumber));
+
+        return $data[1] - 10000;
+    }
 
     public function modifyOne($tag, $value, $id, $ref="ref") {
         return $this->updateOne(table_name_prefix."patient", $tag, $value, $id, $ref);
@@ -140,6 +151,10 @@ class patient extends common {
             $add = " LIMIT ".$start.", ".$limit;
         } else {
             $add = "";
+        }
+
+        if (strpos(strtolower($search), "lh") !== false) {
+            return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."patient` WHERE `ref` = :search  ORDER BY `last_name`, `ref` DESC".$add, array(':search' => $this->idFromPatientNumber($search)), $type);
         }
 
         return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."patient` WHERE (`last_name` LIKE :search OR `first_name` LIKE :search OR `sex` LIKE :search OR `phone_number` LIKE :search OR `email` LIKE :search) ORDER BY `last_name` ASC".$add, array(':search' => "%".$search."%"), $type);
@@ -214,6 +229,7 @@ class patient extends common {
         global $admin;
         $admin->minify = true;
         $return['ref'] = intval($data['ref']);
+        $return['patienrNumber'] = $this->patienrNumber( $data['patienrNumber'] );
         $return['lastName'] = $data['last_name'];
         $return['firstName'] = $data['first_name'];
         $return['age'] = $data['age'];

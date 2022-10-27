@@ -128,14 +128,14 @@ echo "<pre>";
 	// 	$url = $u."v1/patient/manage/search/ade";
 	// 	echo get($header, $url);
 
-    // // invoice
-    // // Add invoice
-	// 	$array['patient_id'] = rand(1, 500);
-    //     for($i = 0; $i < rand(1, 20); $i++) {
-    //         $array['billing_component'][$i]['id'] = rand(1, 11);
-    //         $array['billing_component'][$i]['quantity'] = rand(1, 10);
-    //         $array['billing_component'][$i]['description'] = "random description ".rand();
-    //     }
+    // invoice
+    // Add invoice
+		$array['patient_id'] = rand(1, 500);
+        for($i = 0; $i < rand(1, 20); $i++) {
+            $array['billing_component'][$i]['id'] = rand(1, 11);
+            $array['billing_component'][$i]['quantity'] = rand(1, 10);
+            $array['billing_component'][$i]['description'] = "random description ".rand();
+        }
 
 	// 	$url = $u."v1/invoice/manage";
 	// 	$json_data = json_encode($array);
@@ -153,6 +153,18 @@ echo "<pre>";
     //     $json_data = json_encode($array);
     //     echo put($header, $url, $json_data);
 
+	// post payment
+		$array['ref'] = 4;
+		$array['amount'] = 200;
+
+		$url = $u."v1/invoice/pay";
+		$json_data = json_encode($array);
+		echo put($header, $url, $json_data);
+
+    // //getdetails
+    //     $url = $u."v1/invoice/component";
+    //     echo get($header, $url);
+
 	// //getdetails
 	// 	$url = $u."v1/invoice/manage/4";
 	// 	echo get($header, $url);
@@ -161,13 +173,17 @@ echo "<pre>";
     //     $url = $u."v1/invoice/manage/list";
     //     echo get($header, $url);
 
-    //getdetails
-        $url = $u."v1/invoice/manage/list/unpaid";
-        echo get($header, $url);
+    // //getdetails
+    //     $url = $u."v1/invoice/manage/list/unpaid";
+    //     echo get($header, $url);
 
     // //getdetails
-    //     $url = $u."v1/invoice/manage/search/nat";
-    //     echo get($header, $url);
+	// 	$url = $u."v1/invoice/manage/search/INV10001";
+	// 	echo get($header, $url);
+
+    // //delete
+    //     $url = $u."v1/invoice/manage/23";
+    //     echo delete($header, $url);
 
     // // Billing Component
     // // Add Billing Component
@@ -208,6 +224,10 @@ echo "<pre>";
 	// 	$url = $u."v1/billingComponent/status";
 	// 	$json_data = json_encode($array);
 	// 	echo put($header, $url, $json_data);
+
+	// //remove
+	// 	$url = $u."v1/billingComponent/manage/12";
+	// 	echo delete($header, $url);
 
     // // Settings
     // // get settings

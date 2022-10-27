@@ -8,14 +8,12 @@ class billing_component extends common {
     protected $allowedFields = array(
         "add" => array(
             "title",
-            "cost",
-            "description"
+            "cost"
         ),
         "edit" => array(
             "ref",
             "title",
-            "cost",
-            "description"
+            "cost"
         )
     );
 
@@ -53,6 +51,14 @@ class billing_component extends common {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public function remove ( $id ) {
+        if ($this->modifyOne("status", "DELETED", $id)) {
+            return $this->successResponse;
+        } else {
+            return $this->internalServerError;
         }
     }
 
@@ -114,13 +120,17 @@ class billing_component extends common {
         return $this->getOne(table_name_prefix."billing_component", $id, "ref");
     }
 
+    public function getAactive() {
+        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."billing_component` WHERE `status` = 'ACTIVE' ORDER BY `title` ASC", false, "list");
+    }
+
     public function getSortedList($id, $tag, $tag2 = false, $id2 = false, $tag3 = false, $id3 = false, $order = 'title', $dir = "ASC", $logic = "AND", $start = false, $limit = false) {
         return $this->sortAll(table_name_prefix."billing_component", $id, $tag, $tag2, $id2, $tag3, $id3, $order, $dir, $logic, $start, $limit);
     }
 
     private function listPages($start, $limit) {
-        $return['data'] = $this->lists(table_name_prefix."billing_component", $start, $limit, "title", "ASC");
-        $return['counts'] = $this->lists(table_name_prefix."billing_component",  false, false, "title", "ASC", false, "count");
+        $return['data'] = $this->lists(table_name_prefix."billing_component", $start, $limit, "title", "ASC", "`status` != 'DELETED'");
+        $return['counts'] = $this->lists(table_name_prefix."billing_component",  false, false, "title", "ASC", "`status` != 'DELETED'", "count");
 
         return $return;
     }
@@ -139,7 +149,8 @@ class billing_component extends common {
             $add = "";
         }
 
-        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."billing_component` WHERE (`title` LIKE :search OR `cost` LIKE :search OR `description` LIKE :search OR `status` LIKE :search) ORDER BY `title` ASC".$add, array(':search' => "%".$search."%"), $type);
+        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."billing_component` WHERE (`title` LIKE :search OR `cost` LIKE :search OR `description` LIKE :search OR `status` LIKE :search) AND `status` != 'DELETED' ORDER BY `title` ASC".$add, array(':search' => "%".$search."%"), $type);
+
 
     }
 
