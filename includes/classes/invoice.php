@@ -286,16 +286,6 @@ class invoice extends common {
 
     }
 
-    private function invoiceNumber($id) {
-        return "INV".(10000+$id);
-    }
-
-    private function idFromInvoiceNumber( $invoiceNumber) {
-        $data = explode("inv", strtolower($invoiceNumber));
-
-        return $data[1] - 10000;
-    }
-
     public function formatResult($data, $single=false) {
         if ($single == false) {
             for ($i = 0; $i < count($data); $i++) {
@@ -320,7 +310,7 @@ class invoice extends common {
         $data['invoiceNumber'] = $this->invoiceNumber($data['ref']);
         $data['patient'] = $patient->formatResult( $patient->listOne( $data['patient_id'] ), true);
         
-        $amount['value'] = $data['amount'];
+        $amount['value'] = floatval($data['amount']);
         $amount['label'] = "&#8358;".number_format( $data['amount'] );
         $data['amount'] = $amount;
 

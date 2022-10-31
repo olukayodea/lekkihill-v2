@@ -4,6 +4,7 @@ class apiAdmin extends api {
 
     public function prepare($header, $request, $data, $file=false) {
         global $admin;
+        global $appointments;
         global $settings;
         global $patient;
         global $invoice;
@@ -298,6 +299,105 @@ class apiAdmin extends api {
                             $return['error']['code'] = 10000;
                             $return['error']["message"] = "You do not have permission to view this page";
                         }
+                    } else if (($mode == "appointments") && ($action == "manage") && ($header['method'] == "POST")) {
+                        $appointments->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['write']) {
+                                $return = $appointments->create($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to write data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "appointments") && ($action == "manage") && ($header['method'] == "PUT")) {
+                        $appointments->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $appointments->edit($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "appointments") && ($action == "cancel") && ($header['method'] == "PUT")) {
+                        $appointments->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['modify']) {
+                                $appointments->id = $string;
+                                $return = $appointments->cancel();
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "appointments") && ($action == "schedule") && ($header['method'] == "PUT")) {
+                        $appointments->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $appointments->schedule($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "appointments") && ($action == "manage") && ($header['method'] == "GET")) {
+                        $appointments->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['read']) {
+                                if (intval( $string  > 0)) {
+                                    $appointments->id = $string;
+                                    $appointments->filter = null;
+                                } else {
+                                    $appointments->filter = $string;
+                                    $appointments->search = (trim($extra) == "") ? null : $extra;
+                                }
+                                $return = $appointments->get($this->page);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "appointments") && ($action == "manage") && ($header['method'] == "DELETE")) {
+
+                        $appointments->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_patient")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $appointments->removeNew($string);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
                     } else if (($mode == "billingcomponent") && ($action == "manage") && ($header['method'] == "POST")) {
                         $billing_component->admin_id = $this->admin_id;
                         if ($this->findRight("mamange_accounts")) {
@@ -410,7 +510,7 @@ class apiAdmin extends api {
                             $return['error']['code'] = 10000;
                             $return['error']["message"] = "You do not have permission to view this page";
                         }
-                    }  
+                    }
                     
                 } else {
                     $return['success'] = false;
@@ -475,7 +575,7 @@ class apiAdmin extends api {
             $array[] = "invoice:manage";
             $array[] = "billingcomponent:manage";
             $array[] = "visitors:manage";
-            $array[] = "appointment:manage";
+            $array[] = "appointments:manage";
             $array[] = "settings:";
             if (array_search($type, $array) === false) {
                 return false;
@@ -497,7 +597,7 @@ class apiAdmin extends api {
             $array[] = "invoice:manage";
             $array[] = "invoice:component";
             $array[] = "visitors:manage";
-            $array[] = "appointment:manage";
+            $array[] = "appointments:manage";
             $array[] = "billingcomponent:manage";
             $array[] = "settings:";
             if (array_search($type, $array) === false) {
@@ -514,7 +614,9 @@ class apiAdmin extends api {
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
             $array[] = "invoice:pay";
-            $array[] = "appointment:manage";
+            $array[] = "appointments:manage";
+            $array[] = "appointments:cancel";
+            $array[] = "appointments:schedule";
             $array[] = "billingcomponent:manage";
             $array[] = "billingcomponent:status";
             if (array_search($type, $array) === false) {
@@ -528,7 +630,7 @@ class apiAdmin extends api {
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
             $array[] = "visitors:manage";
-            $array[] = "appointment:manage";
+            $array[] = "appointments:manage";
             $array[] = "billingcomponent:manage";
             if (array_search($type, $array) === false) {
                 return false;

@@ -100,16 +100,9 @@ class patient extends common {
             return $this->NotModified;
         }
     }
-    
-
-    private static function patienrNumber($id) {
-        return "LH".(100000+$id);
-    }
-
-    private function idFromPatientNumber( $invoiceNumber) {
-        $data = explode("lh", strtolower($invoiceNumber));
-
-        return $data[1] - 10000;
+		
+    public function checkAccount($email) {
+        return $this->select(table_name_prefix."patient", false, "list", "`email` = :email", array(':email' => $email), false, false, "ref");
     }
 
     public function modifyOne($tag, $value, $id, $ref="ref") {
@@ -227,7 +220,11 @@ class patient extends common {
 
     private function clean($data) {
         global $admin;
+        global $appointments;
+        global $invoice;
         $admin->minify = true;
+        $appointments->minify = true;
+        $invoice->minify = true;
         $return['ref'] = intval($data['ref']);
         $return['patienrNumber'] = $this->patienrNumber( $data['patienrNumber'] );
         $return['lastName'] = $data['last_name'];
@@ -243,6 +240,9 @@ class patient extends common {
             $return['kin']['address'] = $data['next_of_address'];
             $return['allergies'] = $data['allergies'];
             $return['type'] = $data['p_type'];
+            $return['appointments'] = $appointments->formatResult( $appointments->getSortedList( $data['ref'], "patient_id") );
+            $return['invoice'] = $invoice->formatResult( $invoice->getSortedList( $data['ref'], "patient_id") );
+            $return['medication'] = [];
             $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by']), true );
             $return['date']['created'] = $data['create_time'];
             $return['date']['modified'] = $data['modify_time'];

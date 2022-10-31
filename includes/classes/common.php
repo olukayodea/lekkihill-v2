@@ -341,5 +341,25 @@
 			}
 			return true;
 		}
+
+		public static function patienrNumber($id) {
+			return "LH".(100000+$id);
+		}
+	
+		public function idFromPatientNumber( $invoiceNumber) {
+			$data = explode("lh", strtolower($invoiceNumber));
+	
+			return $data[1] - 10000;
+		}
+
+		public function invoiceNumber($id) {
+			return "INV".(10000+$id);
+		}
+	
+		public function idFromInvoiceNumber( $invoiceNumber) {
+			$data = explode("inv", strtolower($invoiceNumber));
+	
+			return $data[1] - 10000;
+		}
 	}
 ?>

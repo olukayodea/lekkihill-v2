@@ -117,7 +117,7 @@ echo "<pre>";
     //     echo put($header, $url, $json_data);
 
 	// //getdetails
-	// 	$url = $u."v1/patient/manage/";
+	// 	$url = $u."v1/patient/manage/129";
 	// 	echo get($header, $url);
 
 	// //getdetails
@@ -128,14 +128,97 @@ echo "<pre>";
 	// 	$url = $u."v1/patient/manage/search/ade";
 	// 	echo get($header, $url);
 
-    // invoice
-    // Add invoice
-		$array['patient_id'] = rand(1, 500);
-        for($i = 0; $i < rand(1, 20); $i++) {
-            $array['billing_component'][$i]['id'] = rand(1, 11);
-            $array['billing_component'][$i]['quantity'] = rand(1, 10);
-            $array['billing_component'][$i]['description'] = "random description ".rand();
-        }
+	// // Appointments
+    // // Add Appointments
+    //     $location = array("Lagos", "Abuja", "Rivers", "Outside Nigeria");
+    //     $procedure = array("Boady Confidence", "Facials", "Breast", "Skin");
+	// 	$array['names'] = "names ".rand();
+	// 	$array['email'] = "scentness@yahoo.com";
+	// 	$array['phone'] = "080".rand(20000000, 99999999);
+	// 	$array['location'] = $location[rand(0, 3)];
+	// 	$array['procedure'] = $procedure[rand(0, 3)];
+	// 	$array['message'] = rand(100, 999)." test Address, API Street, Computer State";
+	// 	$array['next_appointment'] = "2023-".rand(1,12)."-".rand(10, 31)."T12:58";
+	// 	$array['patient_id'] = rand(0, 644);
+	// 	$url = $u."v1/appointments/manage";
+	// 	$json_data = json_encode($array);
+	// 	echo post($header, $url, $json_data);
+
+    // // edit Appointments
+	// 	$array['ref'] = 1604;
+	// 	$location = array("Lagos", "Abuja", "Rivers", "Outside Nigeria");
+	// 	$procedure = array("Boady Confidence", "Facials", "Breast", "Skin");
+	// 	$array['names'] = "names ".rand();
+	// 	$array['email'] = "scentness@yahoo.com";
+	// 	$array['phone'] = "080".rand(20000000, 99999999);
+	// 	$array['location'] = $location[rand(0, 3)];
+	// 	$array['procedure'] = $procedure[rand(0, 3)];
+	// 	$array['message'] = rand(100, 999)." test Address, API Street, Computer State";
+	// 	$array['next_appointment'] = "2023-".rand(1,12)."-".rand(10, 31)."T12:58";
+	// 	$array['patient_id'] = rand(0, 644);
+    //     $url = $u."v1/appointments/manage";
+    //     $json_data = json_encode($array);
+    //     echo put($header, $url, $json_data);
+
+	// //get Appointments
+	// $url = $u."v1/appointments/manage/15";
+	// echo get($header, $url);
+
+	// //get Appointments
+	// 	$url = $u."v1/appointments/manage/list?page=1";
+	// 	echo get($header, $url);
+
+	//search Appointments
+		// $url = $u."v1/appointments/manage/list/new";
+		// echo get($header, $url);
+
+	// //search Appointments
+	// 	$url = $u."v1/appointments/manage/list/scheduled";
+	// 	echo get($header, $url);
+
+	// //search Appointments
+	// 	$url = $u."v1/appointments/manage/list/cancelled";
+	// 	echo get($header, $url);
+
+	// // search Appointments
+	// 	$url = $u."v1/appointments/manage/view/today";
+	// 	echo get($header, $url);
+
+	// //search Appointments
+	// 	$url = $u."v1/appointments/manage/view/past";
+	// 	echo get($header, $url);
+
+	// //search Appointments
+	// 	$url = $u."v1/appointments/manage/view/upcoming";
+	// 	echo get($header, $url);
+
+	// //search Appointments
+	// 	$url = $u."v1/appointments/manage/search/ade";
+	// 	echo get($header, $url);
+
+    // // schedule Appointments
+    //     $array['ref'] = 15;
+    //     $array['appointmentDate'] = "2022-10-28T12:58";
+    //     $url = $u."v1/appointments/schedule";
+    //     $json_data = json_encode($array);
+    //     echo put($header, $url, $json_data);
+
+    // //cancel
+    //     $url = $u."v1/appointments/cancel/23";
+    //     echo put($header, $url, '');
+
+    // //delete
+    //     $url = $u."v1/appointments/manage/23";
+    //     echo delete($header, $url);
+
+    // // invoice
+    // // Add invoice
+	// 	$array['patient_id'] = rand(1, 500);
+    //     for($i = 0; $i < rand(1, 20); $i++) {
+    //         $array['billing_component'][$i]['id'] = rand(1, 11);
+    //         $array['billing_component'][$i]['quantity'] = rand(1, 10);
+    //         $array['billing_component'][$i]['description'] = "random description ".rand();
+    //     }
 
 	// 	$url = $u."v1/invoice/manage";
 	// 	$json_data = json_encode($array);
@@ -153,13 +236,13 @@ echo "<pre>";
     //     $json_data = json_encode($array);
     //     echo put($header, $url, $json_data);
 
-	// post payment
-		$array['ref'] = 4;
-		$array['amount'] = 200;
+	// // post payment
+	// 	$array['ref'] = 4;
+	// 	$array['amount'] = 200;
 
-		$url = $u."v1/invoice/pay";
-		$json_data = json_encode($array);
-		echo put($header, $url, $json_data);
+	// 	$url = $u."v1/invoice/pay";
+	// 	$json_data = json_encode($array);
+	// 	echo put($header, $url, $json_data);
 
     // //getdetails
     //     $url = $u."v1/invoice/component";
@@ -227,6 +310,50 @@ echo "<pre>";
 
 	// //remove
 	// 	$url = $u."v1/billingComponent/manage/12";
+	// 	echo delete($header, $url);
+
+    // Inventory
+    // Add Inventory
+		
+        $array['title'] = "title".rand();
+        $array['cost'] = rand(1008, 9000000);
+        $array['description'] = "random description ".rand();
+
+		$url = $u."v1/inventory/manage";
+		$json_data = json_encode($array);
+		echo post($header, $url, $json_data);
+
+    // // edit Inventory
+	// 	$array['ref'] = 14;
+    //     $array['title'] = "title ".rand();
+    //     $array['cost'] = rand(1008, 9000000);
+    //     $array['description'] = "random description ".rand();
+
+    //     $url = $u."v1/inventory/manage";
+    //     $json_data = json_encode($array);
+    //     echo put($header, $url, $json_data);
+
+	// //get Inventory
+	// 	$url = $u."v1/inventory/manage/4";
+	// 	echo get($header, $url);
+
+    // //get Inventory
+    //     $url = $u."v1/inventory/manage/list";
+    //     echo get($header, $url);
+
+    // //get Inventory
+    //     $url = $u."v1/inventory/manage/search/reast";
+    //     echo get($header, $url);
+
+	// // change status
+	// 	$array['ref'] = 14;
+	// 	$array['status'] = "activate";
+	// 	$url = $u."v1/inventory/status";
+	// 	$json_data = json_encode($array);
+	// 	echo put($header, $url, $json_data);
+
+	// //remove
+	// 	$url = $u."v1/inventory/manage/12";
 	// 	echo delete($header, $url);
 
     // // Settings

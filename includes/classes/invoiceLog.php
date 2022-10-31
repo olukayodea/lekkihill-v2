@@ -28,7 +28,7 @@ class invoiceLog extends common {
     private function clean($data) {
         global $admin;
         
-        $amount['value'] = $data['amount'];
+        $amount['value'] = floatval($data['amount']);
         $amount['label'] = "&#8358;".number_format( $data['amount'] );
         $result['amount'] = $amount;
 

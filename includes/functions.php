@@ -58,6 +58,7 @@
 	include_once("classes/billing_component.php");
 	include_once("classes/invoice.php");
 	include_once("classes/invoiceLog.php");
+	include_once("classes/appointments.php");
 	include_once("classes/visitors.php");
 	include_once("classes/settings.php");
 	$admin = new admin;
@@ -66,6 +67,7 @@
 	$billing_component = new billing_component;
 	$invoice = new invoice;
 	$invoiceLog = new invoiceLog;
+	$appointments = new appointments;
 	$settings = new settings;
 	$visitors = new visitors;
 	
