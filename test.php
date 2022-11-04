@@ -312,29 +312,76 @@ echo "<pre>";
 	// 	$url = $u."v1/billingComponent/manage/12";
 	// 	echo delete($header, $url);
 
-    // Inventory
-    // Add Inventory
-		
-        $array['title'] = "title".rand();
-        $array['cost'] = rand(1008, 9000000);
-        $array['description'] = "random description ".rand();
 
-		$url = $u."v1/inventory/manage";
-		$json_data = json_encode($array);
-		echo post($header, $url, $json_data);
+    // // Inventory Category 
+    // // Add Inventory Category
+		
+    //     $array['title'] = "title".rand();
+
+	// 	$url = $u."v1/inventory/category";
+	// 	$json_data = json_encode($array);
+	// 	echo post($header, $url, $json_data);
+
+
+	// //get Inventory Category
+	// 	$url = $u."v1/inventory/category/1";
+	// 	echo get($header, $url);
+
+    // //get Inventory Category
+    //     $url = $u."v1/inventory/category/list";
+    //     echo get($header, $url);
+
+	// //get Inventory Category
+	// 	$url = $u."v1/inventory/category/list/active";
+	// 	echo get($header, $url);
+
+	// //get Inventory Category
+	// 	$url = $u."v1/inventory/category/list/inactive";
+	// 	echo get($header, $url);
+
+    // //get Inventory Category
+    //     $url = $u."v1/inventory/category/search/drug";
+    //     echo get($header, $url);
+
+	// // change Inventory Category
+	// 	$array['ref'] = 3;
+	// 	$array['status'] = "deactivate";
+	// 	$url = $u."v1/inventory/category/status";
+	// 	$json_data = json_encode($array);
+	// 	echo put($header, $url, $json_data);
+
+	// //remove Inventory Category
+	// 	$url = $u."v1/inventory/category/2";
+	// 	echo delete($header, $url);
+
+    // // Inventory
+    // // Add Inventory
+		
+		// $qty_desc = array("Pack of 14 caps", "1 Vial", "1 Tab", "1 sachet", "1 piece", "1 pack of 20 tabs", "1 pack of 10 tabs", "1 Pack", "1 Cap", "1 Bottle", "1 blister pack of 10 tabs", "1 Blister pack", "1 bag", "1 Ampoule", "1 Pack");
+        // $array['title'] = "title".rand();
+        // $array['cost'] = rand(1008, 9000000);
+        // $array['qty_desc'] = $qty_desc[rand(0, count($qty_desc)-1)];
+		// $array['inventory_added'] = rand(2000, 10000);
+		// $array['category_id'] = 1;
+
+	// 	$url = $u."v1/inventory/manage";
+	// 	$json_data = json_encode($array);
+	// 	echo post($header, $url, $json_data);
 
     // // edit Inventory
-	// 	$array['ref'] = 14;
-    //     $array['title'] = "title ".rand();
-    //     $array['cost'] = rand(1008, 9000000);
-    //     $array['description'] = "random description ".rand();
+	// 	$qty_desc = array("Pack of 14 caps", "1 Vial", "1 Tab", "1 sachet", "1 piece", "1 pack of 20 tabs", "1 pack of 10 tabs", "1 Pack", "1 Cap", "1 Bottle", "1 blister pack of 10 tabs", "1 Blister pack", "1 bag", "1 Ampoule", "1 Pack");
+	// 	$array['title'] = "edited title ".rand();
+	// 	$array['cost'] = rand(1008, 9000000);
+	// 	$array['qty_desc'] = $qty_desc[rand(0, count($qty_desc)-1)];
+	// 	$array['category_id'] = 1;
+	// 	$array['ref'] = 82;
 
     //     $url = $u."v1/inventory/manage";
     //     $json_data = json_encode($array);
     //     echo put($header, $url, $json_data);
 
 	// //get Inventory
-	// 	$url = $u."v1/inventory/manage/4";
+	// 	$url = $u."v1/inventory/manage/41";
 	// 	echo get($header, $url);
 
     // //get Inventory
@@ -342,18 +389,27 @@ echo "<pre>";
     //     echo get($header, $url);
 
     // //get Inventory
-    //     $url = $u."v1/inventory/manage/search/reast";
+    //     $url = $u."v1/inventory/manage/search/Drugs";
     //     echo get($header, $url);
 
 	// // change status
-	// 	$array['ref'] = 14;
+	// 	$array['ref'] = 82;
 	// 	$array['status'] = "activate";
-	// 	$url = $u."v1/inventory/status";
+	// 	$url = $u."v1/inventory/manage/status";
 	// 	$json_data = json_encode($array);
 	// 	echo put($header, $url, $json_data);
 
+	// change stock
+		$array['ref'] = 41;
+		$array['action'] = "add";
+		// $array['action'] = "remove";
+		$array['count'] = 200;
+		$url = $u."v1/inventory/manage/stock";
+		$json_data = json_encode($array);
+		echo put($header, $url, $json_data);
+
 	// //remove
-	// 	$url = $u."v1/inventory/manage/12";
+	// 	$url = $u."v1/inventory/manage/82";
 	// 	echo delete($header, $url);
 
     // // Settings

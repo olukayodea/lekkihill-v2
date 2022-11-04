@@ -44,7 +44,6 @@ class billing_component extends common {
             return $this->internalServerError;
         }
     }
-
 		
     function modifyOne($tag, $value, $id) {
         if ($this->updateOne(table_name_prefix."billing_component", $tag, $value, $id, "ref", "`modify_time` = ".time())) {
@@ -207,18 +206,18 @@ class billing_component extends common {
 
     }
 
-    public function formatResult($data, $single=false) {
+    public function formatResult($data, $single=false, $mini=false) {
         if ($single == false) {
             for ($i = 0; $i < count($data); $i++) {
-                $data[$i] = $this->clean($data[$i]);
+                $data[$i] = $this->clean($data[$i], $mini);
             }
         } else {
-            $data = $this->clean($data);
+            $data = $this->clean($data, $mini);
         }
         return $data;
     }
 
-    private function clean($data) {
+    private function clean($data, $mini) {
         global $admin;
         $admin->minify = true;
 
@@ -228,13 +227,13 @@ class billing_component extends common {
         $cost['label'] = "&#8358;".number_format( $data['cost'] );
         $data['cost'] = $cost;
 
-        if ($this->minify === false) {
+        if ($mini === false) {
             $status['active'] = ("ACTIVE" == $data['status']) ? true : false;
             $status['inActive'] = ("IN-ACTIVE" == $data['status']) ? true : false;
             $data['status'] = $status;
 
-            $data['createdBy'] = $admin->formatResult( $admin->listOne( $data['created_by'] ), true);
-            $data['lastModifiedBy'] = $admin->formatResult( $admin->listOne( $data['last_modified_by'] ), true);
+            $data['createdBy'] = $admin->formatResult( $admin->listOne( $data['created_by'] ), true, true);
+            $data['lastModifiedBy'] = $admin->formatResult( $admin->listOne( $data['last_modified_by'] ), true, true);
 
             $data['date']['created'] = $data['create_time'];
             $data['date']['modified'] = $data['modify_time'];

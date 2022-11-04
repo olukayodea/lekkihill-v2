@@ -8,6 +8,8 @@ class apiAdmin extends api {
         global $settings;
         global $patient;
         global $invoice;
+        global $inventory;
+        global $inventory_category;
         global $billing_component;
         global $visitors;
 
@@ -481,6 +483,187 @@ class apiAdmin extends api {
                             $return['error']['code'] = 10000;
                             $return['error']["message"] = "You do not have permission to view this page";
                         }
+                    } else if (($mode == "inventory") && ($action == "manage") && ($header['method'] == "POST")) {
+                        $inventory->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory")) {
+                            if ($this->userData['rights']['write']) {
+                                $return = $inventory->create($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to write data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "manage") && ($string == "stock") && ($header['method'] == "PUT")) {
+                        $inventory->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $inventory->manageStock($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "manage") && ($string == "status") && ($header['method'] == "PUT")) {
+                        $inventory->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $inventory->changeStatus($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "manage") && ($header['method'] == "PUT")) {
+                        $inventory->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $inventory->edit($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "manage") && ($header['method'] == "GET")) {
+                        $inventory->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory")) {
+                            if ($this->userData['rights']['read']) {
+                                if (intval( $string  > 0)) {
+                                    $inventory->id = $string;
+                                    $inventory->filter = null;
+                                } else {
+                                    $inventory->filter = $string;
+                                    $inventory->search = (trim($extra) == "") ? null : $extra;
+                                }
+                                $return = $inventory->get($this->page);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "manage") && ($header['method'] == "DELETE")) {
+
+                        $inventory->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $inventory->remove($string);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "category") && ($header['method'] == "POST")) {
+                        $inventory_category->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory_category")) {
+                            if ($this->userData['rights']['write']) {
+                                $return = $inventory_category->create($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to write data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "category") && ($string == "status")) {
+                        $inventory_category->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory_category")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $inventory_category->changeStatus($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "category") && ($header['method'] == "PUT")) {
+                        $inventory_category->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory_category")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $inventory_category->create($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "category") && ($header['method'] == "GET")) {
+                        $inventory_category->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory_category")) {
+                            if ($this->userData['rights']['read']) {
+                                if (intval( $string  > 0)) {
+                                    $inventory_category->id = $string;
+                                    $inventory_category->filter = null;
+                                } else {
+                                    $inventory_category->filter = $string;
+                                    $inventory_category->search = (trim($extra) == "") ? null : $extra;
+                                }
+                                $return = $inventory_category->get($this->page);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "inventory") && ($action == "category") && ($header['method'] == "DELETE")) {
+
+                        $inventory_category->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory_category")) {
+                            if ($this->userData['rights']['modify']) {
+                                $return = $inventory_category->remove($string);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to modify data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
                     } else if (($mode == "settings") && ($header['method'] == "POST")) {
 
                         if ($this->findRight("manage_settings")) {
@@ -573,6 +756,8 @@ class apiAdmin extends api {
             $array[] = "admin:login";
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
+            $array[] = "inventory:manage";
+            $array[] = "inventory:category";
             $array[] = "billingcomponent:manage";
             $array[] = "visitors:manage";
             $array[] = "appointments:manage";
@@ -596,6 +781,8 @@ class apiAdmin extends api {
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
             $array[] = "invoice:component";
+            $array[] = "inventory:manage";
+            $array[] = "inventory:category";
             $array[] = "visitors:manage";
             $array[] = "appointments:manage";
             $array[] = "billingcomponent:manage";
@@ -614,6 +801,8 @@ class apiAdmin extends api {
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
             $array[] = "invoice:pay";
+            $array[] = "inventory:manage";
+            $array[] = "inventory:category";
             $array[] = "appointments:manage";
             $array[] = "appointments:cancel";
             $array[] = "appointments:schedule";
@@ -629,6 +818,8 @@ class apiAdmin extends api {
             $array[] = "admin:remove";
             $array[] = "patient:manage";
             $array[] = "invoice:manage";
+            $array[] = "inventory:manage";
+            $array[] = "inventory:category";
             $array[] = "visitors:manage";
             $array[] = "appointments:manage";
             $array[] = "billingcomponent:manage";

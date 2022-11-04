@@ -59,6 +59,11 @@
 	include_once("classes/invoice.php");
 	include_once("classes/invoiceLog.php");
 	include_once("classes/appointments.php");
+	include_once("classes/inventory_used.php");
+	include_once("classes/inventory_count.php");
+	include_once("classes/inventory.php");
+	include_once("classes/generateDownloads.php");
+	include_once("classes/inventory_category.php");
 	include_once("classes/visitors.php");
 	include_once("classes/settings.php");
 	$admin = new admin;
@@ -68,6 +73,8 @@
 	$invoice = new invoice;
 	$invoiceLog = new invoiceLog;
 	$appointments = new appointments;
+	$inventory = new inventory;
+	$inventory_category = new inventory_category;
 	$settings = new settings;
 	$visitors = new visitors;
 	

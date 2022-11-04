@@ -207,24 +207,22 @@ class patient extends common {
 
     }
 
-    public function formatResult($data, $single=false) {
+    public function formatResult($data, $single=false, $mini=false) {
         if ($single == false) {
             for ($i = 0; $i < count($data); $i++) {
-                $data[$i] = $this->clean($data[$i]);
+                $data[$i] = $this->clean($data[$i], $mini);
             }
         } else {
-            $data = $this->clean($data);
+            $data = $this->clean($data, $mini);
         }
         return $data;
     }
 
-    private function clean($data) {
+    private function clean($data, $mini) {
         global $admin;
         global $appointments;
         global $invoice;
-        $admin->minify = true;
-        $appointments->minify = true;
-        $invoice->minify = true;
+        
         $return['ref'] = intval($data['ref']);
         $return['patienrNumber'] = $this->patienrNumber( $data['patienrNumber'] );
         $return['lastName'] = $data['last_name'];
@@ -233,20 +231,21 @@ class patient extends common {
         $return['sex'] = $data['sex'];
         $return['phoneNumber'] = $data['phone_number'];
         $return['email'] = $data['email'];
-        if ($this->minify === false) {
+        if ($mini === false) {
             $return['address'] = $data['address'];
             $return['kin']['name'] = $data['next_of_Kin'];
             $return['kin']['contact'] = $data['next_of_contact'];
             $return['kin']['address'] = $data['next_of_address'];
             $return['allergies'] = $data['allergies'];
             $return['type'] = $data['p_type'];
-            $return['appointments'] = $appointments->formatResult( $appointments->getSortedList( $data['ref'], "patient_id") );
-            $return['invoice'] = $invoice->formatResult( $invoice->getSortedList( $data['ref'], "patient_id") );
+            $return['appointments'] = $appointments->formatResult( $appointments->getSortedList( $data['ref'], "patient_id"), false, true );
+            $return['invoice'] = $invoice->formatResult( $invoice->getSortedList( $data['ref'], "patient_id"), false, true );
             $return['medication'] = [];
-            $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by']), true );
+            $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by']), true, true );
             $return['date']['created'] = $data['create_time'];
             $return['date']['modified'] = $data['modify_time'];
         }
+
         return $return;
     }
 

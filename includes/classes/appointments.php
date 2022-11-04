@@ -284,22 +284,20 @@ class appointments extends common {
 
     }
 
-    public function formatResult($data, $single=false) {
+    public function formatResult($data, $single=false, $mini=false) {
         if ($single == false) {
             for ($i = 0; $i < count($data); $i++) {
-                $data[$i] = $this->clean($data[$i]);
+                $data[$i] = $this->clean($data[$i], $mini);
             }
         } else {
-            $data = $this->clean($data);
+            $data = $this->clean($data, $mini);
         }
         return $data;
     }
 
-    private function clean($data) {
+    private function clean($data, $mini) {
         global $admin;
         global $patient;
-        $admin->minify = true;
-        $patient->minify = true;
         $return['ref'] = intval($data['ref']);
         $return['returning'] = ($data['patient_id'] > 0) ? true : false;
         $return['names'] = $data['names'];
@@ -314,10 +312,10 @@ class appointments extends common {
         $status['cancelled'] = ("CANCELLED" == $data['status']) ? true : false;
         $status['passed'] = (time() > strtotime( $data['next_appointment'])) ? true : false;
         $return['status'] = $status;
-        if ($this->minify === false) {
-            $return['patient'] = ($data['patient_id'] > 0) ? $patient->formatResult( $patient->listOne( $data['patient_id'] ), true) : [];
-            $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by']), true );
-            $return['lastModifiedBy'] = $admin->formatResult( $admin->listOne( $data['last_modify']), true );
+        if ($mini === false) {
+            $return['patient'] = ($data['patient_id'] > 0) ? $patient->formatResult( $patient->listOne( $data['patient_id'] ), true, true) : [];
+            $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by']), true, true );
+            $return['lastModifiedBy'] = $admin->formatResult( $admin->listOne( $data['last_modify']), true, true );
             $return['date']['next'] = $data['next_appointment'];
             $return['date']['created'] = $data['create_time'];
             $return['date']['modified'] = $data['modify_time'];

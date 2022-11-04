@@ -153,7 +153,6 @@ class visitors extends common {
 
     private function clean($data) {
         global $admin;
-        $admin->minify = true;
         $return['ref'] = intval($data['ref']);
         $return['lastName'] = $data['last_name'];
         $return['firstName'] = $data['first_name'];
@@ -162,7 +161,7 @@ class visitors extends common {
         $return['address'] = $data['address'];
         $return['whomToSee']['name'] = $data['whom_to_see'];
         $return['whomToSee']['resason'] = $data['resason'];
-        $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['added_by']), true );
+        $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['added_by']), true, true );
         $return['date']['created'] = $data['create_time'];
         $return['date']['modified'] = $data['modify_time'];
         return $return;

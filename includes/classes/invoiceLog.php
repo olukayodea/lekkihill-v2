@@ -32,7 +32,7 @@ class invoiceLog extends common {
         $amount['label'] = "&#8358;".number_format( $data['amount'] );
         $result['amount'] = $amount;
 
-        $result['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by'] ), true);
+        $result['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by'] ), true, true);
 
         $result['date']['created'] = $data['create_time'];
         $result['date']['modified'] = $data['modify_time'];

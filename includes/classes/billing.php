@@ -80,18 +80,16 @@ class billing extends common {
 
     public function clean($data) {
         global $billing_component;
-        $billing_component->minify = true;
 
         $data['ref'] = intval($data['ref']);
         $data['quantity'] = intval($data['quantity']);
-
 
         $status['unPaid'] = ("NEW" == $data['status']) ? true : false;
         $status['partiallyPaid'] = ("PARTIALLY-PAID" == $data['status']) ? true : false;
         $status['paid'] = ("PAID" == $data['status']) ? true : false;
         $data['status'] = $status;
 
-        $billingComponent = $billing_component->formatResult($billing_component->listOne( $data['billing_component_id'] ), true);
+        $billingComponent = $billing_component->formatResult($billing_component->listOne( $data['billing_component_id'] ), true, true);
         $data['component'] = $billingComponent;
 
         $cost['value'] = floatval($data['cost']);

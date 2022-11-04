@@ -286,29 +286,26 @@ class invoice extends common {
 
     }
 
-    public function formatResult($data, $single=false) {
+    public function formatResult($data, $single=false, $mini=false) {
         if ($single == false) {
             for ($i = 0; $i < count($data); $i++) {
-                $data[$i] = $this->clean($data[$i]);
+                $data[$i] = $this->clean($data[$i], $mini);
             }
         } else {
-            $data = $this->clean($data);
+            $data = $this->clean($data, $mini);
         }
         return $data;
     }
  
-    private function clean($data) {
+    private function clean($data, $mini) {
         global $patient;
         global $admin;
         global $billing;
         global $invoiceLog; 
-
-        $admin->minify = true;
-        $patient->minify = true;
         
         $data['ref'] = intval($data['ref']);
         $data['invoiceNumber'] = $this->invoiceNumber($data['ref']);
-        $data['patient'] = $patient->formatResult( $patient->listOne( $data['patient_id'] ), true);
+        $data['patient'] = $patient->formatResult( $patient->listOne( $data['patient_id'] ), true, true);
         
         $amount['value'] = floatval($data['amount']);
         $amount['label'] = "&#8358;".number_format( $data['amount'] );
@@ -318,21 +315,21 @@ class invoice extends common {
         $due['label'] = "&#8358;".number_format( $data['due'] );
         $data['due'] = $due;
 
-        $data['payments'] = $invoiceLog->formatResult( $invoiceLog->getList($data['ref']) );
+        $data['payments'] = $invoiceLog->formatResult( $invoiceLog->getList($data['ref']), false, true );
 
         $status['unPaid'] = ("UN-PAID" == $data['status']) ? true : false;
         $status['partiallyPaid'] = ("PARTIALLY-PAID" == $data['status']) ? true : false;
         $status['paid'] = ("PAID" == $data['status']) ? true : false;
         $data['status'] = $status;
 
-        if ($this->minify === false) {
-            $data['invoiceComponent'] = $billing->formatResult( $billing->getSortedList($data['ref'], "invoice_id") );
-            $data['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by'] ), true);
+        if ($mini === false) {
+            $data['invoiceComponent'] = $billing->formatResult( $billing->getSortedList($data['ref'], "invoice_id"), false, true );
+            $data['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by'] ), true, true);
 
-            $data['date']['due'] = $data['due_date'];
-            $data['date']['created'] = $data['create_time'];
-            $data['date']['modified'] = $data['modify_time'];
         }
+        $data['date']['due'] = $data['due_date'];
+        $data['date']['created'] = $data['create_time'];
+        $data['date']['modified'] = $data['modify_time'];
         
         unset($data['create_by']);
         unset($data['patient_id']);

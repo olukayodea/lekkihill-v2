@@ -196,14 +196,14 @@
 			return $this->getOne("lekkihill_roles", $id, $tag);
 		}
 
-		public function formatResult($data, $single=false) {
+		public function formatResult($data, $single=false, $mini=false) {
 			if ($data) {
 				if ($single === false) {
 					for ($i = 0; $i < count($data); $i++) {
-						$data[$i] = $this->clean($data[$i]);
+						$data[$i] = $this->clean($data[$i], $mini);
 					}
 				} else {
-					$data = $this->clean($data);
+					$data = $this->clean($data, $mini);
 				}
 			} else {
 				return [];
@@ -211,7 +211,7 @@
 			return $data;
 		}
 	
-		private function clean($row) {
+		private function clean($row, $mini) {
 			$return['ref'] = intval($row['ID']);
 			if ($this->addToken == true) {
 				$return['token'] = $row['user_token'];
@@ -220,7 +220,7 @@
 			$return['name'] = $row['display_name'];
 			$return['email'] = $row['user_email'];
 
-            if ($this->minify === false) {
+            if ($mini === false) {
                 $adminType = $this->listOneType($row['user_role']);
                 
                 $return['rights'] = $this->formatRightResult( $adminType, true);
