@@ -10,10 +10,16 @@ class inventory extends inventory_count {
             "category_id"
         ),
         "edit" => array(
+            "ref",
             "title",
             "cost",
             "qty_desc",
             "category_id"
+        ),
+        "stock" => array(
+            "ref",
+            "action",
+            "count"
         )
     );
 
@@ -67,6 +73,8 @@ class inventory extends inventory_count {
             return $this->BadReques;
         }
 
+        unset($array['inventory_added']);
+
         $ref = $array['ref'];
         if ( $this->update(table_name_prefix."inventory", $array, ["ref" => $ref])) {
 
@@ -78,6 +86,10 @@ class inventory extends inventory_count {
     }
 
     public function manageStock($array) {
+        if (!$this->validateInput($array, "stock")) {
+            $this->BadReques['error']['additional_message'] = "some input values are missing";
+            return $this->BadReques;
+        }
         $data = $this->listOne($array['ref']);
 
         if ($data) {
@@ -339,15 +351,15 @@ class inventory extends inventory_count {
         $data['discount'] = (floatval($data['discount']) > 0) ? array("active" => true, "value" => floatval($data['discount'])) : array("active" => false, "value" => floatval($data['discount']));
         $data['category'] = $inventory_category->formatResult( $inventory_category->listOne( $data['category_id'] ), true, true);
         $data['quantity'] = intval( $this->getBalance( $data['ref'] ) );
+        $status['active'] = ("ACTIVE" == $data['status']) ? true : false;
+        $status['inActive'] = ("IN-ACTIVE" == $data['status']) ? true : false;
+        $status['lowAlert'] = ($this->getBalance( $data['ref']) <= $settings->get("lowInventoryCount")) ? true : false;
+        $data['status'] = $status;
         if ($mini === false) {
             $data['links']['barcode'] = URL . "barcode/" . $data['sku'];
             $data['links']['pdf'] = URL . "pdf/" . $pdf->generateToken() . "/inventory/" . $data['ref'];
             $data['links']['csv'] = URL . "csv/" . $csv->generateToken() . "/inventory/" . $data['ref'];
             $data['activities'] = $this->formatCountResult( $this->getSortedInventoryCount($data['ref'], "inventory_id") );
-            $status['active'] = ("ACTIVE" == $data['status']) ? true : false;
-            $status['inActive'] = ("IN-ACTIVE" == $data['status']) ? true : false;
-            $status['lowAlert'] = ($this->getBalance( $data['ref']) <= $settings->get("lowInventoryCount")) ? true : false;
-            $data['status'] = $status;
 
             $data['createdBy'] = $admin->formatResult( $admin->listOne( $data['created_by'] ), true, true);
             $data['lastModifiedBy'] = $admin->formatResult( $admin->listOne( $data['last_modified_by'] ), true, true);

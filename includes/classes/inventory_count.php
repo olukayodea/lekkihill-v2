@@ -28,7 +28,7 @@ class inventory_count extends inventory_used {
 
     private function cleanCount($data) {
         global $admin;
-
+        
         $result['count']['after'] = intval($data['inventory_before_added']) + intval($data['inventory_added']);
         $result['count']['inventoryAdded'] = intval($data['inventory_added']);
         $result['count']['before'] = intval($data['inventory_before_added']);

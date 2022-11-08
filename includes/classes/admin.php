@@ -26,6 +26,7 @@
 		}
 
 		public function logout() {
+			session_destroy();
 			$this->modifyOne("user_token", NULL, $this->id);
 			$this->modifyOne("auth_token_expire", NULL, $this->id);
 		}

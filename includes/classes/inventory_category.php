@@ -196,6 +196,18 @@ class inventory_category extends common
         return $this->query("SELECT * FROM `" . table_prefix . table_name_prefix . "inventory_category` WHERE (`title` LIKE :search OR `status` LIKE :search) AND `status` != 'DELETED' ORDER BY `title` ASC" . $add, array(':search' => "%" . $search . "%"), $type);
     }
 
+
+    private function getActive() {
+        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."inventory_category` WHERE `status` = 'ACTIVE' ORDER BY `title` ASC", false, "list");
+    }
+
+    public function getActiveCategory() {
+        $data = $this->getActive();
+
+        $this->successResponse['data'] = $this->formatResult( $data );
+        return $this->successResponse;
+    }
+
     public function get($page = 1)
     {
         global $settings;
@@ -278,7 +290,6 @@ class inventory_category extends common
             $data['date']['created'] = $data['create_time'];
             $data['date']['modified'] = $data['modify_time'];
         } else {
-            unset($data['ref']);
             unset($data['status']);
         }
         unset($data['created_by']);

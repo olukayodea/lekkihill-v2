@@ -119,7 +119,7 @@ class billing_component extends common {
         return $this->getOne(table_name_prefix."billing_component", $id, "ref");
     }
 
-    public function getAactive() {
+    public function getActive() {
         return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."billing_component` WHERE `status` = 'ACTIVE' ORDER BY `title` ASC", false, "list");
     }
 

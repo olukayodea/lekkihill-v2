@@ -50,13 +50,6 @@
 			return $result;
 		}
 		
-		function _bot_detected() {
-		  return (
-			isset($_SERVER['HTTP_USER_AGENT'])
-			&& preg_match('/bot|crawl|slurp|spider|mediapartners/i', $_SERVER['HTTP_USER_AGENT'])
-		  );
-		}
-		
 		function curl_file_get_contents($url) {
 			if(strstr($url, "https") == 0) {
 				return $this->curl_file_get_contents_https($url);

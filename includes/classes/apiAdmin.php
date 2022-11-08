@@ -596,6 +596,22 @@ class apiAdmin extends api {
                             $return['error']['code'] = 10000;
                             $return['error']["message"] = "You do not have permission to view this page";
                         }
+                    } else if (($mode == "inventory") && ($action == "category") && ($string == "active")) {
+                        
+                        $inventory_category->admin_id = $this->admin_id;
+                        if ($this->findRight("manage_inventory")) {
+                            if ($this->userData['rights']['read']) {
+                                $return = $inventory_category->getActiveCategory();
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
                     } else if (($mode == "inventory") && ($action == "category") && ($string == "status")) {
                         $inventory_category->admin_id = $this->admin_id;
                         if ($this->findRight("manage_inventory_category")) {

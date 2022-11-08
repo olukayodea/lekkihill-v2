@@ -14,10 +14,12 @@ class generateDownloads extends common {
     }
 
     public function generateToken() {
+        session_start();
+        $_SESSION['user'] = $this->user_id;
         $array['user_id'] = $this->user_id;
         $array['type'] = $this->type;
         $array['slug'] = $this->slug;
-        $array['token'] = strtolower($this->confirmToken($this->createRandomPassword(50)));
+        $array['token'] = strtolower($this->confirmToken($this->createRandomPassword(32)));
 
         $replace[] = "user_id";
         $replace[] = "slug";
@@ -43,6 +45,10 @@ class generateDownloads extends common {
 
     public function getToken() {
         return $this->getOne(table_name_prefix."downloads", $this->token, "token");
+    }
+
+    public function validateAccess($token) {
+        print_r($_SESSION);
     }
 }
 ?>

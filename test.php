@@ -116,9 +116,9 @@ echo "<pre>";
     //     $json_data = json_encode($array);
     //     echo put($header, $url, $json_data);
 
-	// //getdetails
-	// 	$url = $u."v1/patient/manage/129";
-	// 	echo get($header, $url);
+	//getdetails
+		$url = $u."v1/patient/manage/129";
+		echo get($header, $url);
 
 	// //getdetails
 	// 	$url = $u."v1/patient/manage/list?page=33";
@@ -322,6 +322,9 @@ echo "<pre>";
 	// 	$json_data = json_encode($array);
 	// 	echo post($header, $url, $json_data);
 
+    // //getdetails
+    //     $url = $u."v1/inventory/category/active";
+    //     echo get($header, $url);
 
 	// //get Inventory Category
 	// 	$url = $u."v1/inventory/category/1";
@@ -357,12 +360,12 @@ echo "<pre>";
     // // Inventory
     // // Add Inventory
 		
-		// $qty_desc = array("Pack of 14 caps", "1 Vial", "1 Tab", "1 sachet", "1 piece", "1 pack of 20 tabs", "1 pack of 10 tabs", "1 Pack", "1 Cap", "1 Bottle", "1 blister pack of 10 tabs", "1 Blister pack", "1 bag", "1 Ampoule", "1 Pack");
-        // $array['title'] = "title".rand();
-        // $array['cost'] = rand(1008, 9000000);
-        // $array['qty_desc'] = $qty_desc[rand(0, count($qty_desc)-1)];
-		// $array['inventory_added'] = rand(2000, 10000);
-		// $array['category_id'] = 1;
+	// 	$qty_desc = array("Pack of 14 caps", "1 Vial", "1 Tab", "1 sachet", "1 piece", "1 pack of 20 tabs", "1 pack of 10 tabs", "1 Pack", "1 Cap", "1 Bottle", "1 blister pack of 10 tabs", "1 Blister pack", "1 bag", "1 Ampoule", "1 Pack");
+    //     $array['title'] = "title".rand();
+    //     $array['cost'] = rand(1008, 9000000);
+    //     $array['qty_desc'] = $qty_desc[rand(0, count($qty_desc)-1)];
+	// 	$array['inventory_added'] = rand(2000, 10000);
+	// 	$array['category_id'] = 1;
 
 	// 	$url = $u."v1/inventory/manage";
 	// 	$json_data = json_encode($array);
@@ -399,14 +402,14 @@ echo "<pre>";
 	// 	$json_data = json_encode($array);
 	// 	echo put($header, $url, $json_data);
 
-	// change stock
-		$array['ref'] = 41;
-		$array['action'] = "add";
-		// $array['action'] = "remove";
-		$array['count'] = 200;
-		$url = $u."v1/inventory/manage/stock";
-		$json_data = json_encode($array);
-		echo put($header, $url, $json_data);
+	// // change stock
+	// 	$array['ref'] = 41;
+	// 	$array['action'] = "add";
+	// 	// $array['action'] = "remove";
+	// 	$array['count'] = 200;
+	// 	$url = $u."v1/inventory/manage/stock";
+	// 	$json_data = json_encode($array);
+	// 	echo put($header, $url, $json_data);
 
 	// //remove
 	// 	$url = $u."v1/inventory/manage/82";

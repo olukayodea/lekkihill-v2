@@ -227,7 +227,7 @@ class invoice extends common {
 
     public function getComponent() {
         global $billing_component;
-        $data = $billing_component->getAactive();
+        $data = $billing_component->getActive();
 
         $this->successResponse['data'] = $billing_component->formatResult( $data );
         return $this->successResponse;

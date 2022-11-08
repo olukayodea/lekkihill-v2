@@ -66,6 +66,9 @@
 	include_once("classes/inventory_category.php");
 	include_once("classes/visitors.php");
 	include_once("classes/settings.php");
+
+	include_once("classes/pdf.php");
+
 	$admin = new admin;
 	$patient = new patient;
 	$billing = new billing;
