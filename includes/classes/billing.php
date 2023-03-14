@@ -35,11 +35,11 @@ class billing extends common {
         if ($id !== false) {
             $tag = '`patient_id` = '.$id.' AND ';
         } else if ($email !== false) {
-            $tag = "`patient_id` = (SELECT `ref` FROM `wp_lekkihill_patient` WHERE `email` = '".$email."' ) AND ";
+            $tag = "`patient_id` = (SELECT `ref` FROM `".table_prefix.table_name_prefix."patient` WHERE `email` = '".$email."' ) AND ";
         }
 
-        $this->balance = $this->query("SELECT SUM(`due`) FROM `wp_lekkihill_invoice` WHERE ". $tag ."`status` != 'PAID'", false, "getCol");
-        $this->list_invoice = $this->query("SELECT * FROM `wp_lekkihill_invoice` WHERE ". $tag ."`status` != 'PAID'", false, "list");
+        $this->balance = $this->query("SELECT SUM(`due`) FROM `".table_prefix.table_name_prefix."invoice` WHERE ". $tag ."`status` != 'PAID'", false, "getCol");
+        $this->list_invoice = $this->query("SELECT * FROM `".table_prefix.table_name_prefix."invoice` WHERE ". $tag ."`status` != 'PAID'", false, "list");
     }
 
     public function report() {
