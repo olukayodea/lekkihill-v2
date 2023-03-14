@@ -1,6 +1,8 @@
 <?php
 	class admin extends common {
         public $minify = false;
+		public $id;
+		public $isActivate;
 
         function wp_hash_password( $password ) {
             global $wp_hasher;
