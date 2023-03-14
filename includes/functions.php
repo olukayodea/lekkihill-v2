@@ -54,8 +54,15 @@
 
 	include_once("classes/admin.php");
 	include_once("classes/patient.php");
+	include_once('classes/clinic_post_op.php');
+	include_once('classes/vitals.php');
+	include_once('classes/clinic_fluid_balance.php');
+	include_once('classes/clinic_medication.php');
+	include_once('classes/clinic_doctors_report.php');
+	include_once("classes/clinic.php");
 	include_once("classes/billing.php");
 	include_once("classes/billing_component.php");
+	include_once("classes/labouratory_component.php");
 	include_once("classes/invoice.php");
 	include_once("classes/invoiceLog.php");
 	include_once("classes/appointments.php");
@@ -71,8 +78,15 @@
 
 	$admin = new admin;
 	$patient = new patient;
+	$clinic_post_op = new clinic_post_op;
+	$vitals = new vitals;
+	$clinic_fluid_balance = new clinic_fluid_balance;
+	$clinic_medication =  new clinic_medication;
+	$clinic_doctors_report = new clinic_doctors_report;
+	$clinic = new clinic;
 	$billing = new billing;
 	$billing_component = new billing_component;
+	$labouratory_component = new labouratory_component;
 	$invoice = new invoice;
 	$invoiceLog = new invoiceLog;
 	$appointments = new appointments;
