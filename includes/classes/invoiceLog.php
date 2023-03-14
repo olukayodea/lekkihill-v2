@@ -1,5 +1,6 @@
 <?php
 class invoiceLog extends common {
+    public $id;
     public function create( $array ) {
         $this->id = $this->insert(table_name_prefix."invoice_log", $array);
 
