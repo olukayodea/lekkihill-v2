@@ -221,10 +221,18 @@ class patient extends common {
     private function clean($data, $mini) {
         global $admin;
         global $appointments;
+        global $billing;
         global $invoice;
+        global $vitals;
+
+        $pendingInvoice = false;
+
+        $upcoming = $appointments->get_upcoming($data['ref']);
+
+        $billing->get_due_invoice($data['ref']);
         
         $return['ref'] = intval($data['ref']);
-        $return['patienrNumber'] = $this->patienrNumber( $data['patienrNumber'] );
+        $return['patienrNumber'] = $this->patienrNumber( $data['ref'] );
         $return['lastName'] = $data['last_name'];
         $return['firstName'] = $data['first_name'];
         $return['age'] = $data['age'];
@@ -239,8 +247,29 @@ class patient extends common {
             $return['allergies'] = $data['allergies'];
             $return['type'] = $data['p_type'];
             $return['appointments'] = $appointments->formatResult( $appointments->getSortedList( $data['ref'], "patient_id"), false, true );
-            $return['invoice'] = $invoice->formatResult( $invoice->getSortedList( $data['ref'], "patient_id"), false, true );
+            $return['invoice'] = $invoice->formatResult( $invoice->getSortedList( $data['ref'], "patient_id", false, false, false, false, "ref", "desc"), false, true );
+            $return['vitals'] = $vitals->formatResult( $vitals->recent_vital($data['ref']), true);
             $return['medication'] = [];
+            $return['notification'] = [];
+
+            if ($billing->balance > 0) {
+                $return['notification'][] = array(
+                    'type' => "invoice",
+                    'alert' => "danger",
+                    'count' => count($billing->list_invoice),
+                    'details' => count($billing->list_invoice) . " pending ". $this->addS( "payment", count($billing->list_invoice)) ." of &#8358; ".number_format($billing->balance)." is due"
+                ); 
+                $pendingInvoice = true;
+            }
+            if (count($upcoming) > 0) {
+                $return['notification'][] = array(
+                    'type' => "appointment",
+                    'alert' => "info",
+                    'count' => count($upcoming),
+                    'details' => count($upcoming) . " upcoming ". $this->addS( "appointment", count($upcoming))
+                ); 
+            }
+            $return['flags']['pendingInvoice'] = $pendingInvoice;
             $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by']), true, true );
             $return['date']['created'] = $data['create_time'];
             $return['date']['modified'] = $data['modify_time'];
