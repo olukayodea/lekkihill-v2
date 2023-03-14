@@ -141,6 +141,46 @@ class invoice extends common {
         }
     }
 
+    public function payMultiInvoice($multiData) {
+        global $billing;
+        global $invoiceLog;
+
+        $success = 0;
+        $error = 0;
+
+
+        foreach ($multiData as $data) {
+            if ($this->query("UPDATE ".table_prefix.table_name_prefix."invoice SET `due` = (`due`-".$data['amount'].") WHERE `ref` = ".$data['ref'])) {
+                $this->modifyOne("status", "PARTIALLY-PAID", $data['ref']);
+                $billing->modifyOne("status", "PARTIALLY-PAID", $data['ref'], "invoice_id");
+
+                $getOne = self::listOne($data['ref']);
+
+                if ($getOne['due'] <= 0) {
+                    $this->modifyOne("status", "PAID", $data['ref']);
+                    $billing->modifyOne("status", "PAID", $data['ref'], "invoice_id");
+                }
+
+                $array['create_by'] = $this->admin_id;
+                $array['invoice_id'] = $data['ref'];
+                $array['amount'] = $data['amount'];
+
+                $invoiceLog->create( $array );
+
+                //send reciept
+
+                $this->successResponse['data'][] = $this->formatResult( $this->listOne( $data['ref']), true );
+                $success++;
+            } else {
+                $this->successResponse['error'][] = $this->formatResult( $this->listOne( $data['ref']), true );
+                $error++;
+            }
+        }
+
+        $this->successResponse['additional_message'] = "Action completed. Modified: ".$success . ", Failed: " . $error;
+        return $this->successResponse;
+    }
+
     public function remove($id) {
         $data = $this->listOne($id);
 
@@ -156,7 +196,6 @@ class invoice extends common {
             return $this->NotAcceptable;
         }
     }
-
 
     public function getPending() {
         return $this->query("SELECT * FROM ".table_prefix.table_name_prefix."invoice WHERE `status` != 'PAID'", false, "list");
@@ -311,7 +350,7 @@ class invoice extends common {
         $amount['label'] = "&#8358;".number_format( $data['amount'] );
         $data['amount'] = $amount;
 
-        $due['value'] = $data['due'];
+        $due['value'] = floatval($data['due']);
         $due['label'] = "&#8358;".number_format( $data['due'] );
         $data['due'] = $due;
 
