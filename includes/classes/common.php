@@ -11,13 +11,13 @@
 		public $message;
 		public $error_message;
 		public $successResponse = array("success" => true, "results" => "OK");
-		public $notFound = array("success" => false, "error" => array(  "code" => 404, "message" => "Not Found"));
-		public $NotModified = array("success" => false, "error" => array(  "code" => 304, "message" => "Not Modified"));
-		public $Unauthorized = array("success" => false, "error" => array(  "code" => 401, "message" => "Unauthorized"));
-		public $NotAcceptable = array("success" => false, "error" => array(  "code" => 406, "message" => "Not Acceptable"));
-		public $RequiredSettingsNotFound = array("success" => false, "error" => array(  "code" => 404, "message" => "Required Settings not Configured"));
-		public $BadReques = array("success" => false, "error" => array(  "code" => 400, "message" => "Bad Reques"));
-		public $internalServerError = array("success" => false, "error" => array( "code" => 500, "message" => "Internal Server Error"));
+		public $notFound = array("success" => false, "error" => array(  "code" => 404, "message" => "Not Found", "additional_message" => ""));
+		public $NotModified = array("success" => false, "error" => array(  "code" => 304, "message" => "Not Modified", "additional_message" => ""));
+		public $Unauthorized = array("success" => false, "error" => array(  "code" => 401, "message" => "Unauthorized", "additional_message" => ""));
+		public $NotAcceptable = array("success" => false, "error" => array(  "code" => 406, "message" => "Not Acceptable", "additional_message" => ""));
+		public $RequiredSettingsNotFound = array("success" => false, "error" => array(  "code" => 404, "message" => "Required Settings not Configured", "additional_message" => ""));
+		public $BadReques = array("success" => false, "error" => array(  "code" => 400, "message" => "Bad Request", "additional_message" => ""));
+		public $internalServerError = array("success" => false, "error" => array( "code" => 500, "message" => "Internal Server Error", "additional_message" => ""));
 
 		function readFile($key) {
 			return $this->getOneField("accessTokens", $key, "tokenKey", "token");
@@ -268,53 +268,6 @@
 			return $result;
 		}
 		
-		function bankList() {
-			$sql = $this->query("SELECT * FROM `bank` ORDER BY `title` ASC", false, "list");
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				foreach($sql as $row) {
-					$result[$count]['id'] = $row['sort_code'];
-					$result[$count]['title'] = ucfirst(strtolower($row['title']));
-					$count++;
-				}
-				return $result;
-			}
-		}
-		
-		function listOneBank($ref, $tag='title') {
-			return $this->getOne("bank", $ref, $tag);
-		}
-		
-		function getOneFieldBank($id, $tag='title', $ref='sort_code') {
-			$data = $this->listOneBank($id, $tag);
-			return $data[$ref];
-		}
-
-		private function clientDash() {
-			global $advert;
-			global $survey;
-			global $advert_stat;
-			$result['advert']['value'] = $advert->clientListAll($this->clientId, '', false, false, "count");
-			$result['advert']['label'] = $this->numberPrintFormat($result['advert']['value']);	
-			$result['survey']['value'] = $survey->clientListAll($this->clientId, '', false, false, "count");
-			$result['survey']['label'] = $this->numberPrintFormat($result['survey']['value']);
-
-			$result['running']['advert']['value'] = $advert->clientList($this->clientId, "count");
-			$result['running']['advert']['label'] = $this->numberPrintFormat($result['running']['advert']['value']);	
-			$result['running']['survey']['value'] = $survey->clientList($this->clientId, "count");
-			$result['running']['survey']['label'] = $this->numberPrintFormat($result['running']['survey']['value']);
-			$result['refund']['impression']['value'] = $advert->clientImpression($this->clientId);
-			$result['refund']['impression']['label'] = $this->numberPrintFormat($result['refund']['impression']['value']);
-			$result['refund']['wallet']['value'] = $advert_stat->getClientAdvertRefund($this->clientId);
-			$result['refund']['wallet']['label'] = $this->numberPrintFormat($result['refund']['impression']['value']);
-
-			
-
-			return $result;
-		}
-		
 		function http2https() {
 			//If the HTTPS is not found to be "on"
 			if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
@@ -353,6 +306,28 @@
 			$data = explode("inv", strtolower($invoiceNumber));
 	
 			return $data[1] - 10000;
+		}
+    
+		function addS($word, $count) {
+			if ($count > 1) {
+				$two = substr($word, -2); 
+				$one = substr($word, -1); 
+				if (($two == "ss") || ($two == "sh") || ($two == "ch")) {
+					return $word."es";
+				} else if (($one == "s") || ($one == "x") || ($one == "z")) {
+					return $word."es";
+				} else if ($two == "lf") {
+					return $word."ves";
+				} else if ($two == "ay") {
+					return $word."s";
+				} else if ($one == "y") {
+					return $word."ies";
+				} else {
+					return $word."s";
+				}
+			} else {
+				return $word;
+			}
 		}
 	}
 ?>
