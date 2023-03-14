@@ -26,6 +26,16 @@ class appointments extends common {
         )
     );
 
+    public function get_upcoming($id=false) {
+        $to = date("Y-m-d H:i:s", time());
+        $tag = "";
+        if ($id !== false) {
+            $tag = '`patient_id` = '.$id.' AND ';
+        }
+
+        return $this->query("SELECT * FROM `".table_prefix.table_name_prefix."appointments` WHERE ". $tag ."`status` = 'SCHEDULED' AND `next_appointment` > '".$to."'", false, "list");
+    }
+
     public function create($array) {
         global $patient;
         if (!$this->validateInput($array, "add")) {
@@ -312,11 +322,11 @@ class appointments extends common {
         $status['cancelled'] = ("CANCELLED" == $data['status']) ? true : false;
         $status['passed'] = (time() > strtotime( $data['next_appointment'])) ? true : false;
         $return['status'] = $status;
+        $return['date']['next'] = $data['next_appointment'];
         if ($mini === false) {
             $return['patient'] = ($data['patient_id'] > 0) ? $patient->formatResult( $patient->listOne( $data['patient_id'] ), true, true) : [];
             $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['create_by']), true, true );
             $return['lastModifiedBy'] = $admin->formatResult( $admin->listOne( $data['last_modify']), true, true );
-            $return['date']['next'] = $data['next_appointment'];
             $return['date']['created'] = $data['create_time'];
             $return['date']['modified'] = $data['modify_time'];
         }
