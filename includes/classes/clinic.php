@@ -72,6 +72,11 @@ class clinic extends common {
             "description",
             "patient_id",
             "cost"
+        ),
+        "lab" => array(
+            "patient_id",
+            "doctors_report_id",
+            "category_id"
         )
     );
 
@@ -111,6 +116,25 @@ class clinic extends common {
         $add = $clinic_medication->create($array);
         if ($add) {
             $this->successResponse['data'] = $clinic_medication->formatResult( $clinic_medication->listOne( $add), true );
+            return $this->successResponse;
+        } else {
+            return $this->internalServerError;
+        }
+    }
+
+    public function add_lab($array) {
+        global $clinic_lab;
+
+        if (!$this->validateInput($array, "lab")) {
+            $this->BadReques['error']['additional_message'] = "some input values are missing";
+            return $this->BadReques;
+        }
+
+        $array['added_by'] = $this->admin_id;
+
+        $add = $clinic_lab->create($array);
+        if ($add) {
+            $this->successResponse['data'] = $clinic_lab->formatResult( $clinic_lab->listOne( $add), true );
             return $this->successResponse;
         } else {
             return $this->internalServerError;
@@ -415,6 +439,54 @@ class clinic extends common {
         } 
     }
 
+    public function getLab($page = 1)
+    {
+        global $clinic_lab;
+        global $settings;
+
+        if (intval($page) == 0) {
+            $page = 1;
+        }
+        $current = (intval($page) > 0) ? (intval($page) - 1) : 0;
+        $limit = intval($settings->get("resultPerPage"));
+        $start = $current * $limit;
+
+        $this->successResponse;
+        
+        if ($this->patient_id > 0) {
+            if ($this->filter != null) {
+                if ($this->filter == "recent") { 
+                    $data = $clinic_lab->recent_lab($this->patient_id);
+                    if ($data) {
+                        $this->successResponse['data'] = $clinic_lab->formatResult($data, true);
+                        return $this->successResponse;
+                    } else {
+                        return $this->notFound;
+                    }
+                } else {
+                    return $this->NotAcceptable;
+                }
+            } else {
+                $clinic_lab->patient_id = $this->patient_id;
+                $result = $clinic_lab->listPages($start, $limit);
+                if ($result['counts'] > 0) {
+                    $this->successResponse['counts']['currentPage'] = intval($page);
+                    $this->successResponse['counts']['totalPage'] = ceil($result['counts'] / $limit);
+                    $this->successResponse['counts']['rowOnCurrentPage'] = count($result['data']);
+                    $this->successResponse['counts']['maxRowPerPage'] = intval($limit);
+                    $this->successResponse['counts']['totalRows'] = $result['counts'];
+                    $this->successResponse['counts']['prevRow'] = (intval($page) * intval($limit)) - intval($limit);
+                    $this->successResponse['data'] = $clinic_lab->formatResult($result['data'], false);
+                } else {
+                    $this->successResponse['data'] = [];
+                }
+                return $this->successResponse;
+            }
+        } else {
+            return $this->NotAcceptable;
+        } 
+    }
+
     public function getDoctorsReport($page = 1)
     {
         global $clinic_doctors_report;
@@ -507,7 +579,7 @@ class clinic extends common {
             $postOp = $this->getDataFromResponse( $this->getPostOp() );
             $medications = $this->getDataFromResponse( $this->getMedication() );
             $doctorsReport = $this->getDataFromResponse( $this->getDoctorsReport() );
-            $labouratory = null;
+            $labouratory = $this->getDataFromResponse( $this->getLab() );;
             $vitalsGraph = $this->drawVitals();
             
 

@@ -58,6 +58,7 @@
 	include_once('classes/vitals.php');
 	include_once('classes/clinic_fluid_balance.php');
 	include_once('classes/clinic_medication.php');
+	include_once('classes/clinic_lab.php');
 	include_once('classes/clinic_doctors_report.php');
 	include_once("classes/clinic.php");
 	include_once("classes/billing.php");
@@ -82,6 +83,7 @@
 	$vitals = new vitals;
 	$clinic_fluid_balance = new clinic_fluid_balance;
 	$clinic_medication =  new clinic_medication;
+	$clinic_lab =  new clinic_lab;
 	$clinic_doctors_report = new clinic_doctors_report;
 	$clinic = new clinic;
 	$billing = new billing;

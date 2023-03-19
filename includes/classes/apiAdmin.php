@@ -1081,6 +1081,45 @@ class apiAdmin extends api {
                     } else if (($mode == "clinic") && ($action == "glucose") && ($header['method'] == "PUT")) {
                     } else if (($mode == "clinic") && ($action == "glucose") && ($header['method'] == "GET")) {
                     } else if (($mode == "clinic") && ($action == "glucose") && ($header['method'] == "DELETE")) {
+                    } else if (($mode == "clinic") && ($action == "lab") && ($header['method'] == "POST")) {
+                        $clinic->admin_id = $this->admin_id;
+                        if ($this->findRight(["manage_clinic"])) {
+                            if ($this->userData['rights']['write']) {
+                                $return = $clinic->add_lab($array_data);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to write data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "clinic") && ($action == "lab") && ($header['method'] == "PUT")) {
+                    } else if (($mode == "clinic") && ($action == "lab") && ($header['method'] == "GET")) {
+                        $clinic->admin_id = $this->admin_id;
+                        if ($this->findRight(["manage_clinic"])) {
+                            if ($this->userData['rights']['read']) {
+                                if (intval( $string  > 0)) {
+                                    $clinic->patient_id = $string;
+                                    $clinic->filter = null;
+                                } else {
+                                    $clinic->filter = $string;
+                                    $clinic->patient_id = intval($extra);
+                                }
+                                $return = $clinic->getLab($this->page);
+                            } else {
+                                $return['success'] = false;
+                                $return['error']['code'] = 10003;
+                                $return['error']["message"] = "You do not have permission to read data";
+                            }
+                        } else {
+                            $return['success'] = false;
+                            $return['error']['code'] = 10000;
+                            $return['error']["message"] = "You do not have permission to view this page";
+                        }
+                    } else if (($mode == "clinic") && ($action == "lab") && ($header['method'] == "DELETE")) {
                     }
                     
                 } else {
@@ -1157,6 +1196,7 @@ class apiAdmin extends api {
             $array[] = "clinic:discharge";
             $array[] = "clinic:vitals";
             $array[] = "clinic:glucose";
+            $array[] = "clinic:lab";
             $array[] = "settings:";
             if (array_search($type, $array) === false) {
                 return false;
@@ -1192,6 +1232,7 @@ class apiAdmin extends api {
             $array[] = "clinic:discharge";
             $array[] = "clinic:vitals";
             $array[] = "clinic:glucose";
+            $array[] = "clinic:lab";
             $array[] = "settings:";
             if (array_search($type, $array) === false) {
                 return false;
@@ -1225,6 +1266,7 @@ class apiAdmin extends api {
             $array[] = "clinic:discharge";
             $array[] = "clinic:vitals";
             $array[] = "clinic:glucose";
+            $array[] = "clinic:lab";
             if (array_search($type, $array) === false) {
                 return false;
             } else {
@@ -1249,6 +1291,7 @@ class apiAdmin extends api {
             $array[] = "clinic:discharge";
             $array[] = "clinic:vitals";
             $array[] = "clinic:glucose";
+            $array[] = "clinic:lab";
             if (array_search($type, $array) === false) {
                 return false;
             } else {

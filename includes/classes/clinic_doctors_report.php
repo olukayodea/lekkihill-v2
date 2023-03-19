@@ -53,11 +53,12 @@ class clinic_doctors_report extends common {
         global $admin;
         global $patient;
         global $clinic_medication;
+        global $clinic_lab;
 
         $return['ref'] = intval($data['ref']);
         $return['report'] = $data['report'];
         $return['medication'] = $clinic_medication->formatResult( $clinic_medication->getSortedList( $data['ref'], "doctors_report_id", false, false, false, false, "ref", "desc"), false, true );
-        $return['labTest'] = [];
+        $return['labTest'] = $clinic_lab->formatResult( $clinic_lab->getSortedList( $data['ref'], "doctors_report_id", false, false, false, false, "ref", "desc"), false, true );
         $return['patient'] = $patient->formatResult( $patient->listOne( $data['patient_id'] ), true, true);
         $return['createdBy'] = $admin->formatResult( $admin->listOne( $data['added_by']), true, true );
         $return['date']['created'] = $data['create_time'];
