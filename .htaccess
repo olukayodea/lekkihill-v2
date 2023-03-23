@@ -6,7 +6,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-dadminPage
 RewriteRule v1/(.*)$ webservice/adminPage.php?request=$1 [QSA,NC,L]
 RewriteRule barcode/(.*)$ includes/classes/barcode.php?f=png&s=code-39-ascii&w=220&d=$1 [QSA,NC,L]
-RewriteRule pdf/(.*)$ includes/pdf.php?resource=$1 [QSA,NC,L]
+RewriteRule documents/(.*)$ includes/documents.php?resource=$1 [QSA,NC,L]
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f

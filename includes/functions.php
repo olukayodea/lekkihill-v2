@@ -5,8 +5,8 @@
 	session_start();
 	date_default_timezone_set("Africa/Lagos");
 	
-    // ini_set('display_errors', 1);
-    // error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
 	
 	$pageUR1 = $_SERVER["SERVER_NAME"];
 	$curdomain = str_replace("www.", "", $pageUR1);
@@ -52,6 +52,11 @@
 	include_once("classes/api.php");
 	$api = new api;
 
+	define( 'LH_PLUGIN_DIR', dirname(  __FILE__ ) )."/";
+
+	require_once 'classes/pdf/tcpdf.php';
+	$pdf = new TCPDF("P", "mm", "A4", true, 'UTF-8', false);
+
 	include_once("classes/admin.php");
 	include_once("classes/patient.php");
 	include_once('classes/clinic_post_op.php');
@@ -74,8 +79,6 @@
 	include_once("classes/inventory_category.php");
 	include_once("classes/visitors.php");
 	include_once("classes/settings.php");
-
-	include_once("classes/pdf.php");
 
 	$admin = new admin;
 	$patient = new patient;
